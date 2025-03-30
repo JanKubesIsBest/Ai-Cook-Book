@@ -1,0 +1,10 @@
+/* app/page.module.css */
+  
+  .loadingText {
+    color: #555; /* Style the loading text color */
+    /* Inherits font from global .title2 */
+  }
+  
+  .recipesList {
+    /* Add any specific list styling if needed */
+  }

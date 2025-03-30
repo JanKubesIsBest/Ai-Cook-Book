@@ -1,0 +1,176 @@
+/* Base Typography (Mobile First) */
+.title1 {
+    font-size: 1.75rem;
+    line-height: 1.2;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.title2 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    font-weight: 600;
+    margin-bottom: 0.875rem;
+}
+
+.title3 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.not-bold {
+    font-weight: 400;
+}
+
+.italic {
+    font-style: italic;
+}
+
+/* Base Spacing (Mobile First) */
+.spacing-xxlarge {
+    margin: 2.5rem 0;
+}
+
+.spacing-xlarge {
+    margin: 2rem 0;
+}
+
+.spacing-large {
+    margin: 1.5rem 0;
+}
+
+.spacing-medium {
+    margin: 1rem 0;
+}
+
+.spacing-small {
+    margin: 0.75rem 0;
+}
+
+.spacing-xsmall {
+    margin: 0.375rem 0;
+}
+
+.padding-xxlarge {
+    padding: 2.5rem;
+}
+
+.padding-xlarge {
+    padding: 2rem;
+}
+
+.padding-large {
+    padding: 1.5rem;
+}
+
+.padding-medium {
+    padding: 1rem;
+}
+
+.padding-small {
+    padding: 0.75rem;
+}
+
+.padding-xsmall {
+    padding: 0.375rem;
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Desktop Styles (768px and up) */
+@media screen and (min-width: 768px) {
+    /* Typography */
+    .title1 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .title2 {
+        font-size: 2rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .title3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .text {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    /* Spacing */
+    .spacing-xxlarge {
+        margin: 4rem 0;
+    }
+
+    .spacing-xlarge {
+        margin: 3rem 0;
+    }
+
+    .spacing-large {
+        margin: 2rem 0;
+    }
+
+    .spacing-medium {
+        margin: 1.5rem 0;
+    }
+
+    .spacing-small {
+        margin: 1rem 0;
+    }
+
+    .spacing-xsmall {
+        margin: 0.5rem 0;
+    }
+
+    .padding-xxlarge {
+        padding: 4rem;
+    }
+
+    .padding-xlarge {
+        padding: 3rem;
+    }
+
+    .padding-large {
+        padding: 2rem;
+    }
+
+    .padding-medium {
+        padding: 1.5rem;
+    }
+
+    .padding-small {
+        padding: 1rem;
+    }
+
+    .padding-xsmall {
+        padding: 0.5rem;
+    }
+}

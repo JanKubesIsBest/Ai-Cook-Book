@@ -1,0 +1,50 @@
+/* components/SearchComponent.module.css */
+
+/* Base styles for the container */
+.searchComponent {
+    display: flex;
+    align-items: center;
+    background-color: #D9D9D9;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
+    /* Add global 'padding-small' class in the component's className prop */
+    /* Example padding if not using global class: padding: 0.75rem 1rem; */
+  }
+  
+  /* Input field styles */
+  .searchInput {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    /* Add global 'text' class in the component's className prop */
+    margin-bottom: 0;
+    padding: 0rem 0.5rem;
+    min-width: 0; /* Prevent input from overflowing flex container */
+  }
+  
+  /* Style the placeholder text */
+  .searchInput::placeholder {
+    color: #000000;
+    font-style: italic;
+    font-weight: bold;
+    font-size: smaller;
+  }
+  
+  /* Search icon styles (applied to the Image component) */
+  .searchIcon {
+    margin: 0 0.5rem 0 0.5rem; /* Adjust margin for spacing */
+    cursor: pointer;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    /* SVG color can be controlled via `fill` or `stroke` in the SVG file */
+    /* or using CSS filter if it's a single color icon */
+    /* filter: invert(30%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(50%) contrast(80%); */ /* Example for grey */
+  }
+  
+  /* Optional: Style on focus */
+  .searchComponent:focus-within {
+    outline: 2px solid dodgerblue;
+    outline-offset: 2px;
+  }
