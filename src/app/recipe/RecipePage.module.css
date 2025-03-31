@@ -1,0 +1,69 @@
+.ingredientsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  padding-left: 1rem;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .ingredientsList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stepsList {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Ensure bullets are visible for ingredients */
+.ingredientsList .listItem {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.ingredientsList .listItem::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--foreground);
+}
+
+/* Custom layout for steps */
+.stepsList .listItem {
+  position: relative;
+  padding-left: 1.5rem;
+  counter-increment: step;
+  display: flex;
+  flex-direction: column; /* Stack the text and search icon vertically */
+  align-items: flex-start; /* Align text to the left */
+  gap: 0.25rem; /* Small gap between text and icon */
+}
+
+/* Numbering aligned to the top */
+.stepsList .listItem::before {
+  content: counter(step) ". ";
+  position: absolute;
+  left: 0;
+  top: 0; /* Align the number with the top of the text */
+  color: var(--foreground);
+}
+
+/* Search icon aligned to the bottom */
+.stepsList .listItem .searchIcon {
+  align-self: flex-end; /* Align the icon to the right */
+  margin-top: auto; /* Push the icon to the bottom of the container */
+}
+
+.searchIcon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

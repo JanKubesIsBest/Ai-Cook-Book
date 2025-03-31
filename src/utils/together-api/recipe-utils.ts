@@ -1,6 +1,6 @@
 import Together from 'together-ai';
 
-interface RecipeItemProps {
+export interface RecipeItemProps {
   title: string;
   description: string;
   ingredients: string[];
@@ -55,12 +55,13 @@ class TogetherAPI {
   
       Respond with a JSON object containing the following fields:
       - "title": a string (the recipe title)
+      - "description": a string (Description of the meal)
       - "descriptionItems": a string (a brief description of the recipe)
       - "items": an array of strings (the list of ingredients)
       - "procedure": a string (a summary of the cooking procedure)
       - "procedureSteps": an array of strings (step-by-step instructions for the recipe)
 
-      Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON
+      Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {
     `;
   
     // Call the Together API with the prompt

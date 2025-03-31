@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
 import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
-
+import styles from "./RecipePage.module.css";
 
 export default function RecipePage() {
   const { selectedRecipe } = useRecipeContext();
@@ -14,7 +14,6 @@ export default function RecipePage() {
   const together = new TogetherAPI();
 
   useEffect(() => {
-    // Only run this effect once when the component mounts
     if (!selectedRecipe) {
       setGeneratedRecipe(null);
       return;
@@ -37,36 +36,62 @@ export default function RecipePage() {
     fetchRecipe();
   }, []); // Empty dependency array ensures this runs only once on mount
 
+  // Placeholder search handler
+  const handleSearch = (text: string) => {
+    console.log(`Searching for: ${text}`);
+    // Future functionality can be added here (e.g., modal, navigation)
+  };
+
   if (!selectedRecipe) {
-    return <p>No recipe selected.</p>;
+    return <p className="text">No recipe selected.</p>;
   }
 
   return (
-    <div>
-      <h1>{selectedRecipe.title}</h1>
-      {loading && <p>Loading recipe...</p>}
-      {error && <p>{error}</p>}
+    <div className="spacing-large">
+      <h1 className="title1">{selectedRecipe.title}</h1>
+      {loading && <p className="text">Loading recipe...</p>}
+      {error && <p className="text">{error}</p>}
       {generatedRecipe ? (
         <div>
-          <h2>{generatedRecipe.title}</h2>
-          <p>{generatedRecipe.descriptionItems}</p>
-          <h3>Ingredients:</h3>
-          <ul>
+          <p className="text">{generatedRecipe.descriptionItems}</p>
+          
+          <h3 className="title3">Ingredients:</h3>
+          <ul className={styles.ingredientsList}>
             {generatedRecipe.items.map((item, index) => (
-              <li key={index}>{item}</li>
+              <li key={index} className={`${styles.listItem} text`}>
+                {item}
+                <img
+                  src="/search.svg"
+                  alt="Search this ingredient"
+                  className={styles.searchIcon}
+                  onClick={() => handleSearch(item)}
+                />
+              </li>
             ))}
           </ul>
-          <h3>Procedure:</h3>
-          <p>{generatedRecipe.procedure}</p>
-          <h3>Steps:</h3>
-          <ol>
+
+          <h3 className="title3">Procedure:</h3>
+          <p className="text">{generatedRecipe.procedure}</p>
+
+          <h3 className="title3">Steps:</h3>
+          <ol className={styles.stepsList}>
             {generatedRecipe.procedureSteps.map((step, index) => (
-              <li key={index}>{step}</li>
+              <li key={index} className={`${styles.listItem} text`}>
+                {step}
+                <img
+                  src="/search.svg"
+                  alt="Search this step"
+                  className={styles.searchIcon}
+                  onClick={() => handleSearch(step)}
+                />
+              </li>
             ))}
           </ol>
         </div>
       ) : (
-        !loading && !error && <p>No detailed recipe generated yet.</p>
+        !loading && !error && (
+          <p className="text">No detailed recipe generated yet.</p>
+        )
       )}
     </div>
   );
