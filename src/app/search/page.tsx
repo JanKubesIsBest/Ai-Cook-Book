@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'; // Hook to read URL query par
 import SearchComponent from '@/components/search/search-component';
 import RecipeItem from '@/components/recipe-item/recipe-item';
 import styles from './page.module.css'; // Using a similar CSS module
+import { RecipeProvider } from '@/components/recipe-context/recipe-context';
 
 // Define the structure of a recipe object (same as before)
 interface Recipe {
@@ -137,7 +138,6 @@ function SearchPageContent() {
                     onSearchSubmit={handleNewSearch}
                 />
             </div>
-
             {recipes.map((recipe, index) => (
                 <RecipeItem
                     key={recipe.id}
