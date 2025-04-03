@@ -9,6 +9,7 @@ export interface RecipeItemProps {
 }
 
 export interface Recipe { 
+  id: number | null;
   title: string;
   descriptionItems: string;
   items: string[];
@@ -86,6 +87,7 @@ class TogetherAPI {
       ) {
         // Return the parsed data as a Recipe object
         return {
+          id: null,
           title: recipeData.title,
           descriptionItems: recipeData.descriptionItems,
           items: recipeData.items,

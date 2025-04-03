@@ -7,16 +7,7 @@ import SearchComponent from '@/components/search/search-component';
 import RecipeItem from '@/components/recipe-item/recipe-item';
 import styles from './page.module.css'; // Using a similar CSS module
 import { RecipeProvider } from '@/components/recipe-context/recipe-context';
-import TogetherAPI from '@/utils/together-api/recipe-utils';
-
-// Define the structure of a recipe object (same as before)
-interface Recipe {
-    id: number;
-    title: string;
-    description: string;
-    ingredients: string[];
-}
-
+import TogetherAPI, { Recipe } from '@/utils/together-api/recipe-utils';
 
 // Component to handle the actual logic, wrapped in Suspense
 function SearchPageContent() {
@@ -35,32 +26,32 @@ function SearchPageContent() {
     // useCallback ensures this function has a stable identity across renders
     // unless its dependencies change (which they don't here)
     const performSearch = useCallback(async (query: string) => {
-        console.log(query)
+        console.log(query);
 
         if (!query) {
             setRecipes([]);
-            setSearchPerformed(true); // Mark search as done (even if query is empty)
+            setSearchPerformed(true);
             setIsLoading(false);
             return;
         }
 
         setSearchPerformed(true);
         setIsLoading(true);
-        setRecipes([]); // Clear previous results immediately
-        setCurrentDisplayQuery(query); // Update the title/query display if needed
+        setRecipes([]);
+        setCurrentDisplayQuery(query);
 
         try {
-            const recipes = await together.searchRecipe(query)
-            console.log(recipes)
-
-            setRecipes(recipes);
+            const fetchedRecipes = await together.searchRecipe(query);
+            console.log(fetchedRecipes);
+            const recipesToSet: Recipe[] = fetchedRecipes || [];
+            setRecipes(recipesToSet);
         } catch (error) {
             console.error("Search failed:", error);
             setRecipes([]);
         } finally {
             setIsLoading(false);
         }
-    }, []); // No dependencies, function is stable
+    }, []);
 
     // Effect to run the initial search when the page loads or initialQuery changes
     useEffect(() => {
@@ -134,8 +125,8 @@ function SearchPageContent() {
                 <RecipeItem
                     key={recipe.id}
                     title={recipe.title}
-                    description={recipe.description}
-                    ingredients={recipe.ingredients}
+                    description={recipe.descriptionItems} // Note: should be description based on Recipe interface
+                    ingredients={recipe.items} // Note: should be ingredients based on Recipe interface
                     isLastItem={index === recipes.length - 1}
                 />
             ))}
