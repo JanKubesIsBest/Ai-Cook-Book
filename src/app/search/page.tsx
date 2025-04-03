@@ -7,6 +7,7 @@ import SearchComponent from '@/components/search/search-component';
 import RecipeItem from '@/components/recipe-item/recipe-item';
 import styles from './page.module.css'; // Using a similar CSS module
 import { RecipeProvider } from '@/components/recipe-context/recipe-context';
+import TogetherAPI from '@/utils/together-api/recipe-utils';
 
 // Define the structure of a recipe object (same as before)
 interface Recipe {
@@ -15,22 +16,6 @@ interface Recipe {
     description: string;
     ingredients: string[];
 }
-
-// --- Mock Search Function (same as before) ---
-const mockSearchItems = (query: string): Promise<Recipe[]> => {
-    console.log(`Simulating search for: ${query}`);
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const results: Recipe[] = [
-                { id: 1, title: "Seasoned ground beef with tomato salad...", description: "Seasoned ground beef, which will make your day...", ingredients: ["Ground beef", "Tomatoes", "Salad", "Oil", "Pepper", "Salt"] },
-                { id: 2, title: "Simple Chicken Stir-fry...", description: "A quick and easy chicken stir-fry...", ingredients: ["Chicken Breast", "Broccoli", "Bell Pepper", "Soy Sauce", "Ginger", "Garlic"] },
-                { id: 3, title: "Vegetarian Pasta Primavera...", description: "A light and flavorful pasta dish...", ingredients: ["Pasta", "Asparagus", "Peas", "Zucchini", "Cherry Tomatoes", "Parmesan"] }
-            ];
-            resolve(results);
-        }, 2500);
-    });
-};
-// --- End Mock Search Function ---
 
 
 // Component to handle the actual logic, wrapped in Suspense
@@ -44,24 +29,31 @@ function SearchPageContent() {
     const [searchPerformed, setSearchPerformed] = useState<boolean>(false);
     const [currentDisplayQuery, setCurrentDisplayQuery] = useState<string>(initialQuery);
 
+    const together = new TogetherAPI();
+
     // Function to perform search and update state
     // useCallback ensures this function has a stable identity across renders
     // unless its dependencies change (which they don't here)
     const performSearch = useCallback(async (query: string) => {
+        console.log(query)
+
         if (!query) {
             setRecipes([]);
             setSearchPerformed(true); // Mark search as done (even if query is empty)
             setIsLoading(false);
             return;
         }
+
         setSearchPerformed(true);
         setIsLoading(true);
         setRecipes([]); // Clear previous results immediately
         setCurrentDisplayQuery(query); // Update the title/query display if needed
 
         try {
-            const results = await mockSearchItems(query);
-            setRecipes(results);
+            const recipes = await together.searchRecipe(query)
+            console.log(recipes)
+
+            setRecipes(recipes);
         } catch (error) {
             console.error("Search failed:", error);
             setRecipes([]);
@@ -82,7 +74,7 @@ function SearchPageContent() {
             setSearchPerformed(false); // Reset if navigated here without a query
             setRecipes([]);
         }
-    }, [initialQuery, performSearch]); // Rerun if the initial query from URL changes
+    }, [initialQuery]); // Rerun if the initial query from URL changes
 
     // Effect for the loading dots animation (same as before)
     useEffect(() => {

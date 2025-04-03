@@ -38,7 +38,11 @@ export default function RecipePage() {
 
   // Placeholder search handler
   const handleSearch = (text: string) => {
-    console.log(`Searching for: ${text}`);
+    if (generatedRecipe != null) {
+      console.log(`Searching for: ${text}`);
+
+      together.askAboutIngredient(text, generatedRecipe)
+    }
     // Future functionality can be added here (e.g., modal, navigation)
   };
 

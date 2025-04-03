@@ -1,3 +1,4 @@
+import { stringify } from 'querystring';
 import Together from 'together-ai';
 
 export interface RecipeItemProps {
@@ -100,24 +101,33 @@ class TogetherAPI {
     }
   }
 
-  async askAboutIngredient(ingredient: string): Promise<string | null> {
-    const prompt = `Provide information about ${ingredient}. Respond with a JSON object containing an "info" field with the description.`;
+  async askAboutIngredient(ingredient: string, wholeRecipe: Recipe): Promise<string | null> {
+    const prompt = `Provide information about this ingrediant or step (I don't know if it is ingredient or step, you have to guess): ${ingredient}.
+    
+    This is the whole recipe so you can create more educated guess and answer with more tailored response: 
+
+    title: ${wholeRecipe.title}
+    Description of items: ${wholeRecipe.descriptionItems}
+    Procedure: ${wholeRecipe.procedure}
+    Steps: ${wholeRecipe.procedureSteps}
+
+    Respond with 2 sentences regarding the ingredient or step. Don't answer if you think it's step or ingredient. Answer for the user. Think about what user wants to know (if it is a step, he might want to know furter details. If it is an ingredient, he might want to learn more about it.)
+    `;
+
+    console.log("Prompt: " + prompt)
+
+
     const content = await this._callAPI(prompt);
-    try {
-      const response = JSON.parse(content);
-      if (typeof response.info === 'string') {
-        return response.info;
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (error) {
-      console.error('Failed to parse ingredient info:', error);
-      return null;
-    }
+    
+    console.log("Answer: " + content)
+
+    return ""
   }
 
-  async searchRecipe(keyword: string): Promise<RecipeItemProps[] | null> {
-    const prompt = `Search for recipes that include ${keyword}. Respond with a JSON object containing a "recipes" field, which is an array of objects, each with "title", "description", and "ingredients" as an array of strings.`;
+  async searchRecipe(keyword: string): Promise<Recipe[] | null> {
+    const prompt = `Search for recipes that include ${keyword}. Respond with a JSON object containing a "recipes" field, which is an array of objects, each with "title", "description", and "ingredients" as an array of strings.
+    
+     Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {`;
     const content = await this._callAPI(prompt);
     try {
       const response = JSON.parse(content);
