@@ -10,7 +10,6 @@ export default function RecipePage() {
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // State to store additional information for each item
   const [additionalInfo, setAdditionalInfo] = useState<{ [key: string]: string }>({});
 
   const together = new TogetherAPI();
@@ -36,9 +35,8 @@ export default function RecipePage() {
     };
 
     fetchRecipe();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
-  // Updated search handler to fetch and display additional info
   const handleSearch = async (type: "ingredient" | "step", index: number, text: string) => {
     if (generatedRecipe != null) {
       try {
@@ -77,13 +75,12 @@ export default function RecipePage() {
                       onClick={() => handleSearch("ingredient", index, item)}
                     />
                   </div>
-                  <div
-                    className={`${styles.additionalInfo} ${
-                      additionalInfo[`ingredient-${index}`] ? styles.show : ""
-                    }`}
-                  >
-                    {additionalInfo[`ingredient-${index}`]}
-                  </div>
+                  {/* Moved additional info here, under the item */}
+                  {additionalInfo[`ingredient-${index}`] && (
+                    <div className={`${styles.additionalInfo} ${styles.show}`}>
+                      <span className="text">{additionalInfo[`ingredient-${index}`]}</span>
+                    </div>
+                  )}
                 </div>
               </li>
             ))}
@@ -98,7 +95,7 @@ export default function RecipePage() {
               <li key={index} className={styles.listItem}>
                 <div className={styles.stepWrapper}>
                   <div className={styles.stepContent}>
-                    {step}
+                    <span className="text">{step}</span>
                     <img
                       src="/search.svg"
                       alt="Search this step"
@@ -106,13 +103,12 @@ export default function RecipePage() {
                       onClick={() => handleSearch("step", index, step)}
                     />
                   </div>
-                  <div
-                    className={`${styles.additionalInfo} ${
-                      additionalInfo[`step-${index}`] ? styles.show : ""
-                    }`}
-                  >
-                    {additionalInfo[`step-${index}`]}
-                  </div>
+                  {/* Moved additional info here, under the step */}
+                  {additionalInfo[`step-${index}`] && (
+                    <div className={`${styles.additionalInfo} ${styles.show}`}>
+                      <span className="text">{additionalInfo[`step-${index}`]}</span>
+                    </div>
+                  )}
                 </div>
               </li>
             ))}

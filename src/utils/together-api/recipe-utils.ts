@@ -102,28 +102,27 @@ class TogetherAPI {
       return null;
     }
   }
-
+  
   async askAboutIngredient(ingredient: string, wholeRecipe: Recipe): Promise<string | null> {
-    const prompt = `Provide information about this ingrediant or step (I don't know if it is ingredient or step, you have to guess): ${ingredient}.
-    
-    This is the whole recipe so you can create more educated guess and answer with more tailored response: 
-
-    title: ${wholeRecipe.title}
-    Description of items: ${wholeRecipe.descriptionItems}
-    Procedure: ${wholeRecipe.procedure}
-    Steps: ${wholeRecipe.procedureSteps}
-
-    Respond with 2 sentences regarding the ingredient or step. Don't answer if you think it's step or ingredient. Answer for the user. Think about what user wants to know (if it is a step, he might want to know furter details. If it is an ingredient, he might want to learn more about it.)
+    const prompt = `
+      Given the following recipe, provide two concise sentences with useful information about "${ingredient}" based on its role in the recipe. The user has clicked a search icon next to this text and wants relevant details—focus on what might interest them, such as an ingredient's properties, substitutions, or preparation tips, or a step's purpose, technique, or common pitfalls, using the recipe context to tailor your response:
+  
+      - Title: ${wholeRecipe.title}
+      - Description: ${wholeRecipe.descriptionItems}
+      - Ingredients: ${wholeRecipe.items.join(', ')}
+      - Procedure: ${wholeRecipe.procedure}
+      - Steps: ${wholeRecipe.procedureSteps.join('; ')}
+  
+      Respond only with the two sentences, nothing else. Avoid mentioning whether you think "${ingredient}" is an ingredient or a step. Do not include any reasoning or extra text beyond the two sentences.
     `;
-
-    console.log("Prompt: " + prompt)
-
-
+  
+    console.log("Prompt: " + prompt);
+  
     const content = await this._callAPI(prompt);
     
-    console.log("Answer: " + content)
-
-    return ""
+    console.log("Answer: " + content);
+  
+    return content || null; // Return the content or null if empty
   }
 
   async searchRecipe(keyword: string): Promise<Recipe[] | null> {

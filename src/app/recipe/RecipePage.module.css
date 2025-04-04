@@ -39,13 +39,15 @@
 /* Additional info section with sliding effect */
 .additionalInfo {
   margin-top: 0.5rem;
-  transition: max-height 0.3s ease-in-out;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Added opacity for fade */
   max-height: 0;
+  opacity: 0; /* Start hidden */
   overflow: hidden;
 }
 
 .additionalInfo.show {
   max-height: 100px; /* Adjust based on expected content height */
+  opacity: 1; /* Fade in */
 }
 
 /* Ensure bullets are visible for ingredients */
