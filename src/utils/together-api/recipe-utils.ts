@@ -127,23 +127,61 @@ class TogetherAPI {
   }
 
   async searchRecipe(keyword: string): Promise<Recipe[] | null> {
-    const prompt = `Search for recipes that include ${keyword}. Respond with a JSON object containing a "recipes" field, which is an array of objects, each with "title", "description", and "ingredients" as an array of strings.
-    
-     Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {`;
+    const prompt = `
+      Search for recipes that include ${keyword}. Respond with a JSON object containing a "recipes" field, which is an array of recipe objects. Each recipe object should have the following fields:
+      - "id": null (or a number if you can assign one)
+      - "title": a string (the recipe title)
+      - "descriptionItems": a string (a brief description of the recipe)
+      - "items": an array of strings (the list of ingredients)
+      - "procedure": a string (a summary of the cooking procedure)
+      - "procedureSteps": an array of strings (step-by-step instructions for the recipe)
+      
+      Example response:
+      {
+        "recipes": [
+          {
+            "id": null,
+            "title": "Example Recipe",
+            "descriptionItems": "Description of the recipe....",
+            "items": ["ingredient1", "ingredient2"],
+            "procedure": "Cook everything together",
+            "procedureSteps": ["Step 1: Do this", "Step 2: Do that"]
+          }
+        ]
+      }
+
+      The user should be amazed by your suggestions, but there as well should be an option
+      for 
+      1. the classic (something that user expects)
+      2. something easy
+      3-4: be creative
+      
+      Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {
+    `;
+  
     const content = await this._callAPI(prompt);
+    
     try {
+      console.log("Raw API response:", content); // Debug the raw response
       const response = JSON.parse(content);
+  
+      // Validate that the response has a "recipes" array and matches the Recipe interface
       if (
         Array.isArray(response.recipes) &&
         response.recipes.every(
           (r: any) =>
+            (r.id === null || typeof r.id === 'number') &&
             typeof r.title === 'string' &&
-            typeof r.description === 'string' &&
-            Array.isArray(r.ingredients) &&
-            r.ingredients.every((i: any) => typeof i === 'string')
+            typeof r.descriptionItems === 'string' &&
+            Array.isArray(r.items) &&
+            r.items.every((i: any) => typeof i === 'string') &&
+            typeof r.procedure === 'string' &&
+            Array.isArray(r.procedureSteps) &&
+            r.procedureSteps.every((s: any) => typeof s === 'string')
         )
       ) {
-        return response.recipes;
+        // Directly return the validated recipes as they match the Recipe interface
+        return response.recipes as Recipe[];
       } else {
         throw new Error('Invalid recipes format');
       }

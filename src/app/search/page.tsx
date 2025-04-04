@@ -42,7 +42,6 @@ function SearchPageContent() {
 
         try {
             const fetchedRecipes = await together.searchRecipe(query);
-            console.log(fetchedRecipes);
             const recipesToSet: Recipe[] = fetchedRecipes || [];
             setRecipes(recipesToSet);
         } catch (error) {
@@ -123,7 +122,7 @@ function SearchPageContent() {
             </div>
             {recipes.map((recipe, index) => (
                 <RecipeItem
-                    key={recipe.id}
+                    key={index} 
                     title={recipe.title}
                     description={recipe.descriptionItems} // Note: should be description based on Recipe interface
                     ingredients={recipe.items} // Note: should be ingredients based on Recipe interface

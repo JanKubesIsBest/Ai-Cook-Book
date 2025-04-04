@@ -17,6 +17,7 @@ const RecipeItem: React.FC<RecipeItemProps> = ({ title, description, ingredients
   const router = useRouter();
   const { setSelectedRecipe } = useRecipeContext();
 
+  console.log("Ingredients: " + ingredients)
   const midPoint = Math.ceil(ingredients.length / 2);
   const firstColumnIngredients = ingredients.slice(0, midPoint);
   const secondColumnIngredients = ingredients.slice(midPoint);

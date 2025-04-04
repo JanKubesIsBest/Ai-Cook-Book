@@ -10,6 +10,8 @@ export default function RecipePage() {
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // State to store additional information for each item
+  const [additionalInfo, setAdditionalInfo] = useState<{ [key: string]: string }>({});
 
   const together = new TogetherAPI();
 
@@ -36,14 +38,16 @@ export default function RecipePage() {
     fetchRecipe();
   }, []); // Empty dependency array ensures this runs only once on mount
 
-  // Placeholder search handler
-  const handleSearch = (text: string) => {
+  // Updated search handler to fetch and display additional info
+  const handleSearch = async (type: "ingredient" | "step", index: number, text: string) => {
     if (generatedRecipe != null) {
-      console.log(`Searching for: ${text}`);
-
-      together.askAboutIngredient(text, generatedRecipe)
+      try {
+        const info = await together.askAboutIngredient(text, generatedRecipe);
+        setAdditionalInfo((prev) => ({ ...prev, [`${type}-${index}`]: info ?? '' }));
+      } catch (err) {
+        console.error("Failed to fetch additional info:", err);
+      }
     }
-    // Future functionality can be added here (e.g., modal, navigation)
   };
 
   if (!selectedRecipe) {
@@ -58,18 +62,29 @@ export default function RecipePage() {
       {generatedRecipe ? (
         <div>
           <p className="text">{generatedRecipe.descriptionItems}</p>
-          
+
           <h3 className="title3">Ingredients:</h3>
           <ul className={styles.ingredientsList}>
             {generatedRecipe.items.map((item, index) => (
-              <li key={index} className={`${styles.listItem} text`}>
-                {item}
-                <img
-                  src="/search.svg"
-                  alt="Search this ingredient"
-                  className={styles.searchIcon}
-                  onClick={() => handleSearch(item)}
-                />
+              <li key={index} className={styles.listItem}>
+                <div className={styles.itemWrapper}>
+                  <div className={styles.itemContent}>
+                    <span className="text">{item}</span>
+                    <img
+                      src="/search.svg"
+                      alt="Search this ingredient"
+                      className={styles.searchIcon}
+                      onClick={() => handleSearch("ingredient", index, item)}
+                    />
+                  </div>
+                  <div
+                    className={`${styles.additionalInfo} ${
+                      additionalInfo[`ingredient-${index}`] ? styles.show : ""
+                    }`}
+                  >
+                    {additionalInfo[`ingredient-${index}`]}
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
@@ -80,22 +95,32 @@ export default function RecipePage() {
           <h3 className="title3">Steps:</h3>
           <ol className={styles.stepsList}>
             {generatedRecipe.procedureSteps.map((step, index) => (
-              <li key={index} className={`${styles.listItem} text`}>
-                {step}
-                <img
-                  src="/search.svg"
-                  alt="Search this step"
-                  className={styles.searchIcon}
-                  onClick={() => handleSearch(step)}
-                />
+              <li key={index} className={styles.listItem}>
+                <div className={styles.stepWrapper}>
+                  <div className={styles.stepContent}>
+                    {step}
+                    <img
+                      src="/search.svg"
+                      alt="Search this step"
+                      className={styles.searchIcon}
+                      onClick={() => handleSearch("step", index, step)}
+                    />
+                  </div>
+                  <div
+                    className={`${styles.additionalInfo} ${
+                      additionalInfo[`step-${index}`] ? styles.show : ""
+                    }`}
+                  >
+                    {additionalInfo[`step-${index}`]}
+                  </div>
+                </div>
               </li>
             ))}
           </ol>
         </div>
       ) : (
-        !loading && !error && (
-          <p className="text">No detailed recipe generated yet.</p>
-        )
+        !loading &&
+        !error && <p className="text">No detailed recipe generated yet.</p>
       )}
     </div>
   );
