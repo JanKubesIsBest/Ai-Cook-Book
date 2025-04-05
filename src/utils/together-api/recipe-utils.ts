@@ -102,7 +102,7 @@ class TogetherAPI {
       return null;
     }
   }
-  
+
   async askAboutIngredient(ingredient: string, wholeRecipe: Recipe): Promise<string | null> {
     const prompt = `
       Given the following recipe, provide two concise sentences with useful information about "${ingredient}" based on its role in the recipe. The user has clicked a search icon next to this text and wants relevant details—focus on what might interest them, such as an ingredient's properties, substitutions, or preparation tips, or a step's purpose, technique, or common pitfalls, using the recipe context to tailor your response:
@@ -189,6 +189,34 @@ class TogetherAPI {
       return null;
     }
   }
+
+  // Inside TogetherAPI class
+async askFollowUpQuestion(question: string, recipe: Recipe, previousResponse: string): Promise<string | null> {
+  const prompt = `
+    The user is asking a follow-up question about the recipe or the previous response. Here is the context:
+
+    Recipe:
+    - Title: ${recipe.title}
+    - Description: ${recipe.descriptionItems}
+    - Ingredients: ${recipe.items.join(', ')}
+    - Procedure: ${recipe.procedure}
+    - Steps: ${recipe.procedureSteps.join('; ')}
+
+    Previous Response: "${previousResponse}"
+
+    Follow-up Question: "${question}"
+
+    Provide a concise and informative answer to the follow-up question, considering both the recipe and the previous response. Respond with no more than two sentences. The sentences should be max 8 words long and targeted on the question.
+  `;
+
+  console.log("Follow-up Prompt: " + prompt);
+
+  const content = await this._callAPI(prompt);
+  
+  console.log("Follow-up Answer: " + content);
+
+  return content || null;
+}
 }
 
 export default TogetherAPI;

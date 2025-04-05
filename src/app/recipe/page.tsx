@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
 import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
 import styles from "./RecipePage.module.css";
+import AdditionalInfo from "@/components/addition-info/additional-info";
 
 export default function RecipePage() {
   const { selectedRecipe } = useRecipeContext();
@@ -75,12 +76,7 @@ export default function RecipePage() {
                       onClick={() => handleSearch("ingredient", index, item)}
                     />
                   </div>
-                  {/* Moved additional info here, under the item */}
-                  {additionalInfo[`ingredient-${index}`] && (
-                    <div className={`${styles.additionalInfo} ${styles.show}`}>
-                      <span className="text">{additionalInfo[`ingredient-${index}`]}</span>
-                    </div>
-                  )}
+                  <AdditionalInfo info={additionalInfo[`ingredient-${index}`]} recipe={generatedRecipe} />
                 </div>
               </li>
             ))}
@@ -103,12 +99,7 @@ export default function RecipePage() {
                       onClick={() => handleSearch("step", index, step)}
                     />
                   </div>
-                  {/* Moved additional info here, under the step */}
-                  {additionalInfo[`step-${index}`] && (
-                    <div className={`${styles.additionalInfo} ${styles.show}`}>
-                      <span className="text">{additionalInfo[`step-${index}`]}</span>
-                    </div>
-                  )}
+                  <AdditionalInfo info={additionalInfo[`step-${index}`]} recipe={generatedRecipe} />
                 </div>
               </li>
             ))}
