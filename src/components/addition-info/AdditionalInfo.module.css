@@ -1,15 +1,37 @@
 .additionalInfo {
   margin-top: 0.5rem;
   margin-left: 1rem; /* Added left margin for visual hierarchy */
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   max-height: 0;
   opacity: 0;
   transform: translateY(-10px); /* Starts slightly above its final position */
   overflow: hidden;
+
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .additionalInfo.show {
   max-height: fit-content; /* Adjust as needed based on content */
   opacity: 1;
   transform: translateY(0); /* Moves to its natural position */
+}
+
+/* Style for the SearchComponent when inside AdditionalInfo */
+.searchContainer {
+  margin-top: 0.1rem;
+  margin-bottom: 1rem;
+
+  padding: 0.5rem;
+  height: 50px;
+  width: 100%; /* Reduce the width to make it smaller */
+}
+
+/* Optional: Style the input and button inside SearchComponent */
+.searchContainer input {
+  padding: 0.25rem 0.5rem; /* Smaller padding for a more compact look */
+  font-size: 0.875rem; /* Smaller font size */
+}
+
+.searchContainer button {
+  padding: 0.25rem 0.5rem; /* Smaller padding for the button */
+  font-size: 0.875rem; /* Smaller font size */
 }

@@ -32,8 +32,15 @@
 .itemContent,
 .stepContent {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Align items to the top */
   gap: 0.5rem;
+}
+
+/* Ensure the text doesn't add extra vertical space */
+.itemContent p,
+.stepContent p {
+  margin: 0; /* Remove default margin to prevent extra space */
+  line-height: 1; /* Prevent extra vertical space from line height */
 }
 
 /* Ensure bullets are visible for ingredients */

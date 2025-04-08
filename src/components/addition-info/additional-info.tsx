@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { Recipe } from '@/utils/together-api/recipe-utils';
 import SearchComponent from '../search/search-component';
-import TogetherAPI from '@/utils/together-api/recipe-utils'; // Ensure this import matches your file structure
+import TogetherAPI from '@/utils/together-api/recipe-utils';
 import styles from './AdditionalInfo.module.css';
 
 interface AdditionalInfoProps {
-  info: string | undefined; // The additional info text, undefined if not present
+  info: string | undefined;
   recipe: Recipe;
 }
 
 export default function AdditionalInfo({ info, recipe }: AdditionalInfoProps) {
   const [followUpResponse, setFollowUpResponse] = useState<string | null>(null);
-  const together = new TogetherAPI(); // Instantiate the TogetherAPI class
+  const together = new TogetherAPI();
 
   const handleSearch = async (query: string) => {
     if (info) {
@@ -32,12 +32,14 @@ export default function AdditionalInfo({ info, recipe }: AdditionalInfoProps) {
       {info && (
         <div className={`${styles.additionalInfo} ${styles.show}`}>
           <span className="text">{info}</span>
-          <SearchComponent 
-            placeholderText="Some other questions?"
-            onSearchSubmit={handleSearch}
-          />
+          <div className={styles.searchContainer}>
+            <SearchComponent
+              placeholderText="Some other questions?"
+              onSearchSubmit={handleSearch}
+            />
+          </div>
           {followUpResponse && (
-            <AdditionalInfo info={followUpResponse} recipe={recipe}></AdditionalInfo>
+            <AdditionalInfo info={followUpResponse} recipe={recipe} />
           )}
         </div>
       )}

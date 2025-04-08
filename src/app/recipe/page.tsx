@@ -63,52 +63,55 @@ export default function RecipePage() {
           <p className="text">{generatedRecipe.descriptionItems}</p>
 
           <h3 className="title3">Ingredients:</h3>
-          <ul className={styles.ingredientsList}>
-            {generatedRecipe.items.map((item, index) => (
-              <li key={index} className={styles.listItem}>
-                <div className={styles.itemWrapper}>
-                  <div className={styles.itemContent}>
-                    <span className="text">{item}</span>
-                    <img
-                      src="/search.svg"
-                      alt="Search this ingredient"
-                      className={styles.searchIcon}
-                      onClick={() => handleSearch("ingredient", index, item)}
-                    />
+          <div className="padding-small">
+            <ul className={styles.ingredientsList}>
+              {generatedRecipe.items.map((item, index) => (
+                <li key={index} className={styles.listItem}>
+                  <div className={styles.itemWrapper}>
+                    <div className={styles.itemContent}>
+                      <p className="text">{item}</p>
+                      <img
+                        src="/search.svg"
+                        alt="Search this ingredient"
+                        className={styles.searchIcon}
+                        onClick={() => handleSearch("ingredient", index, item)}
+                      />
+                    </div>
+                    <AdditionalInfo info={additionalInfo[`ingredient-${index}`]} recipe={generatedRecipe} />
                   </div>
-                  <AdditionalInfo info={additionalInfo[`ingredient-${index}`]} recipe={generatedRecipe} />
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+            </div>
 
-          <h3 className="title3">Procedure:</h3>
-          <p className="text">{generatedRecipe.procedure}</p>
+            <h3 className="title3">Procedure:</h3>
+            <p className="text">{generatedRecipe.procedure}</p>
 
-          <h3 className="title3">Steps:</h3>
-          <ol className={styles.stepsList}>
-            {generatedRecipe.procedureSteps.map((step, index) => (
-              <li key={index} className={styles.listItem}>
-                <div className={styles.stepWrapper}>
-                  <div className={styles.stepContent}>
-                    <span className="text">{step}</span>
-                    <img
-                      src="/search.svg"
-                      alt="Search this step"
-                      className={styles.searchIcon}
-                      onClick={() => handleSearch("step", index, step)}
-                    />
+            <h3 className="title3">Steps:</h3>
+            <ol className={styles.stepsList}>
+              {generatedRecipe.procedureSteps.map((step, index) => (
+                <li key={index} className={styles.listItem}>
+                  <div className={styles.stepWrapper}>
+                    <div className={styles.stepContent}>
+                      <p className="text">{step}
+                        <img
+                          src="/search.svg"
+                          alt="Search this step"
+                          className={styles.searchIcon}
+                          onClick={() => handleSearch("step", index, step)}
+                        />
+                      </p>
+                    </div>
+                    <AdditionalInfo info={additionalInfo[`step-${index}`]} recipe={generatedRecipe} />
                   </div>
-                  <AdditionalInfo info={additionalInfo[`step-${index}`]} recipe={generatedRecipe} />
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      ) : (
-        !loading &&
-        !error && <p className="text">No detailed recipe generated yet.</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+          ) : (
+          !loading &&
+          !error && <p className="text">No detailed recipe generated yet.</p>
       )}
-    </div>
-  );
+        </div>
+      );
 }

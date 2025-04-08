@@ -152,9 +152,13 @@ class TogetherAPI {
       The user should be amazed by your suggestions, but there as well should be an option
       for 
       1. the classic (something that user expects)
+      - This means that you neccesarly don't want to add something that user has demanded. 
+      - Ofcourse, somethings need to be made with something/in something, so then you might make a decision to make something with the thing user has demanded.
       2. something easy
       3-4: be creative
       
+      NEVER EVER suggest user to make something from already made product. For example, when user demands chicken nuggets, he wants to make chicken nuggets in his kitchen. If user wants to make fish fingers, he does not want to buy them.
+
       Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {
     `;
   
