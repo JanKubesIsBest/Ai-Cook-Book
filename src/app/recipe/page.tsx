@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
 import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
 import styles from "./RecipePage.module.css";
@@ -13,15 +13,28 @@ export default function RecipePage() {
   const [error, setError] = useState<string | null>(null);
   const [additionalInfo, setAdditionalInfo] = useState<{ [key: string]: string }>({});
 
+  // Use a ref to track if the initial fetch has been performed
+  const hasFetchedRecipe = useRef(false);
+
   const together = new TogetherAPI();
 
   useEffect(() => {
+    console.log("useEffect triggered in RecipePage");
+
+    // Prevent duplicate calls in Strict Mode
+    if (hasFetchedRecipe.current) {
+      console.log("Initial fetch already performed, skipping");
+      return;
+    }
+
     if (!selectedRecipe) {
+      console.log("No selected recipe, resetting state");
       setGeneratedRecipe(null);
       return;
     }
 
     const fetchRecipe = async () => {
+      console.log(`fetchRecipe called for recipe: "${selectedRecipe.title}"`);
       setLoading(true);
       setError(null);
       try {
@@ -35,14 +48,16 @@ export default function RecipePage() {
       }
     };
 
+    hasFetchedRecipe.current = true;
     fetchRecipe();
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleSearch = async (type: "ingredient" | "step", index: number, text: string) => {
+    console.log(`handleSearch called for ${type} at index ${index}: "${text}"`);
     if (generatedRecipe != null) {
       try {
         const info = await together.askAboutIngredient(text, generatedRecipe);
-        setAdditionalInfo((prev) => ({ ...prev, [`${type}-${index}`]: info ?? '' }));
+        setAdditionalInfo((prev) => ({ ...prev, [`${type}-${index}`]: info ?? "" }));
       } catch (err) {
         console.error("Failed to fetch additional info:", err);
       }
@@ -82,36 +97,36 @@ export default function RecipePage() {
                 </li>
               ))}
             </ul>
-            </div>
-
-            <h3 className="title3">Procedure:</h3>
-            <p className="text">{generatedRecipe.procedure}</p>
-
-            <h3 className="title3">Steps:</h3>
-            <ol className={styles.stepsList}>
-              {generatedRecipe.procedureSteps.map((step, index) => (
-                <li key={index} className={styles.listItem}>
-                  <div className={styles.stepWrapper}>
-                    <div className={styles.stepContent}>
-                      <p className="text">{step}
-                        <img
-                          src="/search.svg"
-                          alt="Search this step"
-                          className={styles.searchIcon}
-                          onClick={() => handleSearch("step", index, step)}
-                        />
-                      </p>
-                    </div>
-                    <AdditionalInfo info={additionalInfo[`step-${index}`]} recipe={generatedRecipe} />
-                  </div>
-                </li>
-              ))}
-            </ol>
           </div>
-          ) : (
-          !loading &&
-          !error && <p className="text">No detailed recipe generated yet.</p>
-      )}
+
+          <h3 className="title3">Procedure:</h3>
+          <p className="text">{generatedRecipe.procedure}</p>
+
+          <h3 className="title3">Steps:</h3>
+          <ol className={styles.stepsList}>
+            {generatedRecipe.procedureSteps.map((step, index) => (
+              <li key={index} className={styles.listItem}>
+                <div className={styles.stepWrapper}>
+                  <div className={styles.stepContent}>
+                    <p className="text">
+                      {step}
+                      <img
+                        src="/search.svg"
+                        alt="Search this step"
+                        className={styles.searchIcon}
+                        onClick={() => handleSearch("step", index, step)}
+                      />
+                    </p>
+                  </div>
+                  <AdditionalInfo info={additionalInfo[`step-${index}`]} recipe={generatedRecipe} />
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-      );
+      ) : (
+        !loading && !error && <p className="text">No detailed recipe generated yet.</p>
+      )}
+    </div>
+  );
 }
