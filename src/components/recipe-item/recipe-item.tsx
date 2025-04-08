@@ -5,6 +5,7 @@ import React from 'react';
 import styles from './RecipeItem.module.css';
 import { useRouter } from 'next/navigation';
 import { useRecipeContext } from '../recipe-context/recipe-context';
+import { Recipe } from '@/utils/together-api/recipe-utils';
 
 interface RecipeItemProps {
   title: string;
@@ -13,26 +14,21 @@ interface RecipeItemProps {
   isLastItem?: boolean;
 }
 
-const RecipeItem: React.FC<RecipeItemProps> = ({ title, description, ingredients, isLastItem = false }) => {
+const RecipeItem: React.FC<Recipe> = ({ title, descriptionItems, items, isLastItem = false }) => {
   const router = useRouter();
   const { setSelectedRecipe } = useRecipeContext();
 
-  console.log("Ingredients: " + ingredients)
-  const midPoint = Math.ceil(ingredients.length / 2);
-  const firstColumnIngredients = ingredients.slice(0, midPoint);
-  const secondColumnIngredients = ingredients.slice(midPoint);
+  const midPoint = Math.ceil(items.length / 2);
+  const firstColumnIngredients = items.slice(0, midPoint);
+  const secondColumnIngredients = items.slice(midPoint);
 
   const handleRecipeClick = () => {
-    console.log("Pushing to recipe");
     const thisRecipeItem: RecipeItemProps = {
       title: title,
-      description: description,
-      ingredients: ingredients,
+      description: descriptionItems,
+      ingredients: items,
     };
-    console.log("Before setSelectedRecipe:", thisRecipeItem);
     setSelectedRecipe({ ...thisRecipeItem }); // Create a new object
-    console.log("After setSelectedRecipe:", thisRecipeItem);
-    console.log("Router before push:", router);
     router.push('/recipe');
   };
 
@@ -43,7 +39,7 @@ const RecipeItem: React.FC<RecipeItemProps> = ({ title, description, ingredients
       style={{ cursor: 'pointer' }}
     >
       <h3 className={`${styles.recipeTitle} title3`}>{title}</h3>
-      <p className={`${styles.recipeDescription} text`}>{description}</p>
+      <p className={`${styles.recipeDescription} text`}>{descriptionItems}</p>
       <p className={`${styles.ingredientsTitle} text bold spacing-small`}>Crucial ingredients needed:</p>
       <div className={styles.ingredientsGrid}>
         <ul className={styles.ingredientsList}>

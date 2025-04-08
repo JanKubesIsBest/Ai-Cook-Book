@@ -15,6 +15,8 @@ export interface Recipe {
   items: string[];
   procedure: string;
   procedureSteps: string[];
+  isLastItem?: boolean;
+  onClick?: () => void; 
 }
 
 class TogetherAPI {
@@ -39,7 +41,6 @@ class TogetherAPI {
         return completion.choices[0].message.content;
       }
 
-      console.log("Response empty: " + completion.choices[0].message?.content)
       return "Error occured!!"
     } catch (error) {
       console.error('API call failed:', error);
@@ -69,8 +70,7 @@ class TogetherAPI {
     // Call the Together API with the prompt
     const content = await this._callAPI(prompt);
   
-    try {
-      console.log("JSON: " + content)      
+    try {  
       // Parse the API response as JSON
       const recipeData = JSON.parse(content);
 
@@ -116,16 +116,13 @@ class TogetherAPI {
       Respond only with the two sentences, nothing else. Avoid mentioning whether you think "${ingredient}" is an ingredient or a step. Do not include any reasoning or extra text beyond the two sentences.
     `;
   
-    console.log("Prompt: " + prompt);
-  
     const content = await this._callAPI(prompt);
-    
-    console.log("Answer: " + content);
   
     return content || null; // Return the content or null if empty
   }
 
   async searchRecipe(keyword: string): Promise<Recipe[] | null> {
+    console.log("SEARCHING RECIPE !!!!")
     const prompt = `
       Search for recipes that include ${keyword}. Respond with a JSON object containing a "recipes" field, which is an array of recipe objects. Each recipe object should have the following fields:
       - "id": null (or a number if you can assign one)
@@ -165,7 +162,6 @@ class TogetherAPI {
     const content = await this._callAPI(prompt);
     
     try {
-      console.log("Raw API response:", content); // Debug the raw response
       const response = JSON.parse(content);
   
       // Validate that the response has a "recipes" array and matches the Recipe interface
@@ -213,11 +209,9 @@ async askFollowUpQuestion(question: string, recipe: Recipe, previousResponse: st
     Provide a concise and informative answer to the follow-up question, considering both the recipe and the previous response. Respond with no more than two sentences. The sentences should be max 8 words long and targeted on the question.
   `;
 
-  console.log("Follow-up Prompt: " + prompt);
 
   const content = await this._callAPI(prompt);
   
-  console.log("Follow-up Answer: " + content);
 
   return content || null;
 }

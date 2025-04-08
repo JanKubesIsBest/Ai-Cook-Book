@@ -1,39 +1,43 @@
 "use client";
 
-import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-
-interface RecipeItemProps {
-  title: string;
-  description: string;
-  ingredients: string[];
-  isLastItem?: boolean;
-}
+import { createContext, useContext, useState, ReactNode } from "react";
+import { RecipeItemProps, Recipe } from "@/utils/together-api/recipe-utils";
 
 interface RecipeContextType {
   selectedRecipe: RecipeItemProps | null;
   setSelectedRecipe: (recipe: RecipeItemProps | null) => void;
+  searchResults: Record<string, Recipe[] | null>;
+  setSearchResults: (keyword: string, results: Recipe[] | null) => void;
 }
 
 const RecipeContext = createContext<RecipeContextType | undefined>(undefined);
 
-export const RecipeProvider = ({ children }: { children: ReactNode }) => {
+export function RecipeProvider({ children }: { children: ReactNode }) {
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeItemProps | null>(null);
+  const [searchResults, setSearchResults] = useState<Record<string, Recipe[] | null>>({});
 
-  useEffect(() => {
-    console.log("recipe changed", selectedRecipe);
-  }, [selectedRecipe]); // Corrected dependency array
+  const handleSetSearchResults = (keyword: string, results: Recipe[] | null) => {
+    setSearchResults((prev) => ({ ...prev, [keyword]: results }));
+  };
 
   return (
-    <RecipeContext.Provider value={{ selectedRecipe, setSelectedRecipe }}>
+    <RecipeContext.Provider
+      value={{
+        selectedRecipe,
+        setSelectedRecipe,
+        searchResults,
+        setSearchResults: handleSetSearchResults,
+      }}
+    >
       {children}
     </RecipeContext.Provider>
   );
-};
+}
 
-export const useRecipeContext = () => {
+export function useRecipeContext() {
   const context = useContext(RecipeContext);
   if (!context) {
-    throw new Error('useRecipeContext must be used within a RecipeProvider');
+    throw new Error("useRecipeContext must be used within a RecipeProvider");
   }
   return context;
-};
+}

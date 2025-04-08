@@ -1,146 +1,175 @@
-// app/search/page.tsx
 "use client";
 
-import React, { useState, useEffect, Suspense, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation'; // Hook to read URL query params
-import SearchComponent from '@/components/search/search-component';
-import RecipeItem from '@/components/recipe-item/recipe-item';
-import styles from './page.module.css'; // Using a similar CSS module
-import { RecipeProvider } from '@/components/recipe-context/recipe-context';
-import TogetherAPI, { Recipe } from '@/utils/together-api/recipe-utils';
+import React, { useState, useEffect, Suspense, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import SearchComponent from "@/components/search/search-component";
+import RecipeItem from "@/components/recipe-item/recipe-item";
+import styles from "./page.module.css";
+import { useRecipeContext } from "@/components/recipe-context/recipe-context";
+import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
 
-// Component to handle the actual logic, wrapped in Suspense
 function SearchPageContent() {
-    const searchParams = useSearchParams();
-    const initialQuery = searchParams.get('q') || ''; // Get query 'q' from URL
+  const { searchResults, setSearchResults, setSelectedRecipe } = useRecipeContext();
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
 
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [loadingDots, setLoadingDots] = useState<string>('');
-    const [searchPerformed, setSearchPerformed] = useState<boolean>(false);
-    const [currentDisplayQuery, setCurrentDisplayQuery] = useState<string>(initialQuery);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadingDots, setLoadingDots] = useState<string>("");
+  const [searchPerformed, setSearchPerformed] = useState<boolean>(false);
+  const [currentDisplayQuery, setCurrentDisplayQuery] = useState<string>(initialQuery);
 
-    const together = new TogetherAPI();
+  // Use a ref to track if the initial search has been performed
+  const hasPerformedInitialSearch = useRef(false);
 
-    // Function to perform search and update state
-    // useCallback ensures this function has a stable identity across renders
-    // unless its dependencies change (which they don't here)
-    const performSearch = useCallback(async (query: string) => {
-        console.log(query);
+  const together = new TogetherAPI();
 
-        if (!query) {
-            setRecipes([]);
-            setSearchPerformed(true);
-            setIsLoading(false);
-            return;
-        }
+  const performSearch = useCallback(
+    async (query: string) => {
+      console.log(`performSearch called with query: "${query}"`);
 
-        setSearchPerformed(true);
-        setIsLoading(true);
+      if (!query) {
+        console.log("Query is empty, resetting state");
         setRecipes([]);
+        setSearchPerformed(true);
+        setIsLoading(false);
+        setCurrentDisplayQuery("");
+        return;
+      }
+
+      // If the query differs from the current display query, force a new search
+      console.log("Old query:", currentDisplayQuery);
+      console.log("New query:", query);
+      const differentQuery = query !== currentDisplayQuery;
+      console.log("Different query?:", differentQuery);
+
+      // Check if results are already cached and the query hasn't changed
+      if (!differentQuery && searchResults[query] !== undefined) {
+        console.log(`Using cached results for query: "${query}"`);
+        setRecipes(searchResults[query] || []);
+        setSearchPerformed(true);
+        setIsLoading(false);
         setCurrentDisplayQuery(query);
+        return;
+      }
 
-        try {
-            const fetchedRecipes = await together.searchRecipe(query);
-            const recipesToSet: Recipe[] = fetchedRecipes || [];
-            setRecipes(recipesToSet);
-        } catch (error) {
-            console.error("Search failed:", error);
-            setRecipes([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+      // Perform a new search if the query is different or not cached
+      console.log(`Performing new search for query: "${query}"`);
+      setSearchPerformed(true);
+      setIsLoading(true);
+      setRecipes([]);
+      setCurrentDisplayQuery(query);
 
-    // Effect to run the initial search when the page loads or initialQuery changes
-    useEffect(() => {
-        if (initialQuery) {
-            // We need to make sure we don't immediately flash the loading state
-            // if the data is already there (e.g., navigating back)
-            // For this example, we'll just run the search on load / query change
-            performSearch(initialQuery);
-        } else {
-            // Handle case where there's no initial query in the URL
-            setSearchPerformed(false); // Reset if navigated here without a query
-            setRecipes([]);
-        }
-    }, [initialQuery]); // Rerun if the initial query from URL changes
+      try {
+        const fetchedRecipes = await together.searchRecipe(query);
+        const recipesToSet: Recipe[] = fetchedRecipes || [];
+        console.log(`Fetched ${recipesToSet.length} recipes for query: "${query}"`);
+        setRecipes(recipesToSet);
+        setSearchResults(query, recipesToSet); // Cache the results
+      } catch (error) {
+        console.error("Search failed:", error);
+        setRecipes([]);
+        setSearchResults(query, []); // Cache empty results on error
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [searchResults, setSearchResults] // Removed currentDisplayQuery from dependencies
+  );
 
-    // Effect for the loading dots animation (same as before)
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout | null = null;
-        if (isLoading) {
-            intervalId = setInterval(() => {
-                setLoadingDots((dots) => (dots.length >= 3 ? '' : dots + '.'));
-            }, 400);
-        } else {
-            setLoadingDots('');
-        }
-        return () => {
-            if (intervalId) clearInterval(intervalId);
-        };
-    }, [isLoading]);
+  useEffect(() => {
+    console.log(`useEffect triggered with initialQuery: "${initialQuery}"`);
 
-    // Handler for searches initiated *from this page's* SearchComponent
-    const handleNewSearch = (newQuery: string) => {
-        // Update the input display immediately (optional, SearchComponent handles its own state)
-        // setCurrentDisplayQuery(newQuery);
-        performSearch(newQuery);
-        // Optional: Update URL without full page reload
-        // router.push(`/search?q=${encodeURIComponent(newQuery)}`);
+    // Prevent duplicate calls in Strict Mode
+    if (hasPerformedInitialSearch.current) {
+      console.log("Initial search already performed, skipping");
+      return;
+    }
+
+    if (initialQuery) {
+      console.log(`Performing initial search for query: "${initialQuery}"`);
+      hasPerformedInitialSearch.current = true;
+      performSearch(initialQuery);
+    } else {
+      console.log("No initial query, resetting state");
+      setSearchPerformed(false);
+      setRecipes([]);
+      setCurrentDisplayQuery("");
+    }
+  }, [initialQuery, performSearch]);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+    if (isLoading) {
+      intervalId = setInterval(() => {
+        setLoadingDots((dots) => (dots.length >= 3 ? "" : dots + "."));
+      }, 400);
+    } else {
+      setLoadingDots("");
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
     };
+  }, [isLoading]);
 
-    return (
-        <main className={``}>
+  const handleNewSearch = (newQuery: string) => {
+    console.log(`handleNewSearch called with newQuery: "${newQuery}"`);
+    performSearch(newQuery);
+    // Optional: Update URL without full page reload
+    window.history.pushState({}, '', `/search?q=${encodeURIComponent(newQuery)}`);
+  };
 
+  const handleRecipeClick = (recipe: Recipe) => {
+    console.log(`handleRecipeClick called for recipe: "${recipe.title}"`);
+    setSelectedRecipe({
+      title: recipe.title,
+      description: recipe.descriptionItems,
+      ingredients: recipe.items,
+    });
+  };
 
-            <div className='not-bold title1 text-start spacing-large italic'>
-                {isLoading ? (
-                    <h1 className={`${styles.loadingText}`}>
-                        Searching for recipes{loadingDots}
-                    </h1>
-                ) : searchPerformed && recipes.length != 0 ? ( // Check if a search has been attempted
-                    <h1 className="">
-                        I got plenty of options for you...
-                    </h1>
-                ) : (
-                    <h1 className="">
-                        Error occured.
-                    </h1>
-                )
-                }
-            </div>
+  return (
+    <main>
+      <div className="not-bold title1 text-start spacing-large italic">
+        {isLoading ? (
+          <h1 className={styles.loadingText}>
+            Searching for recipes{loadingDots}
+          </h1>
+        ) : searchPerformed && recipes.length !== 0 ? (
+          <h1>I got plenty of options for you...</h1>
+        ) : (
+          <h1>Error occurred.</h1>
+        )}
+      </div>
 
-            <div className="spacing-large">
-                <SearchComponent
-                    placeholderText="Enter ingredients..."
-                    // Pass the initial query from URL to prefill the input
-                    initialValue={initialQuery}
-                    // Handle new searches initiated on this page
-                    onSearchSubmit={handleNewSearch}
-                />
-            </div>
-            {recipes.map((recipe, index) => (
-                <RecipeItem
-                    key={index} 
-                    title={recipe.title}
-                    description={recipe.descriptionItems} // Note: should be description based on Recipe interface
-                    ingredients={recipe.items} // Note: should be ingredients based on Recipe interface
-                    isLastItem={index === recipes.length - 1}
-                />
-            ))}
+      <div className="spacing-large">
+        <SearchComponent
+          placeholderText="Enter ingredients..."
+          initialValue={initialQuery}
+          onSearchSubmit={handleNewSearch}
+        />
+      </div>
 
-        </main>
-    );
+      {recipes.map((recipe, index) => (
+        <RecipeItem
+          id={index}
+          key={index}
+          title={recipe.title}
+          descriptionItems={recipe.descriptionItems}
+          items={recipe.items}
+          procedure=""
+          procedureSteps={[]}
+          onClick={() => handleRecipeClick(recipe)}
+        />
+      ))}
+    </main>
+  );
 }
 
-
-// We need to wrap the component using useSearchParams in Suspense
-// as recommended by Next.js documentation.
 export default function SearchPage() {
-    return (
-        <Suspense fallback={<div className="title2 text-center padding-large">Loading search...</div>}>
-            <SearchPageContent />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<div className="title2 text-center padding-large">Loading search...</div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
 }
