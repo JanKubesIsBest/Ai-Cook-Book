@@ -70,14 +70,14 @@ export default function RecipePage() {
 
   return (
     <div className="spacing-large">
-      <h1 className="title1">{selectedRecipe.title}</h1>
+      <h1 className="title1 ">{selectedRecipe.title}</h1>
       {loading && <p className="text">Loading recipe...</p>}
       {error && <p className="text">{error}</p>}
       {generatedRecipe ? (
         <div>
           <p className="text">{generatedRecipe.descriptionItems}</p>
 
-          <h3 className="title3">Ingredients:</h3>
+          <h3 className="title3 italic">Ingredients:</h3>
           <div className="padding-small">
             <ul className={styles.ingredientsList}>
               {generatedRecipe.items.map((item, index) => (
@@ -99,10 +99,10 @@ export default function RecipePage() {
             </ul>
           </div>
 
-          <h3 className="title3">Procedure:</h3>
+          <h3 className="title3 italic">Procedure:</h3>
           <p className="text">{generatedRecipe.procedure}</p>
 
-          <h3 className="title3">Steps:</h3>
+          <h3 className="title3 italic">Steps:</h3>
           <ol className={styles.stepsList}>
             {generatedRecipe.procedureSteps.map((step, index) => (
               <li key={index} className={styles.listItem}>
