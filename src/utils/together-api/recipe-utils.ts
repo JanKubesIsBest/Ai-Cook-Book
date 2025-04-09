@@ -113,7 +113,9 @@ class TogetherAPI {
       - Procedure: ${wholeRecipe.procedure}
       - Steps: ${wholeRecipe.procedureSteps.join('; ')}
   
-      Respond only with the two sentences, nothing else. Avoid mentioning whether you think "${ingredient}" is an ingredient or a step. Do not include any reasoning or extra text beyond the two sentences.
+       Avoid mentioning whether you think "${ingredient}" is an ingredient or a step. Do not include any reasoning or extra text beyond the two sentences.
+
+       Respond only with the two sentences, nothing else. Each sentence should be about 5 words, so 10 words TOTAL!
     `;
   
     const content = await this._callAPI(prompt);
