@@ -43,7 +43,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     // Combine CSS module class with global utility classes like 'padding-small'
     <div className={`${styles.searchComponent} padding-medium`}>
       <input
-        type="text bold"
+        type="text bold italic"
         // Combine CSS module class with global utility classes like 'text'
         className={`${styles.searchInput} text`}
         placeholder={placeholderText}

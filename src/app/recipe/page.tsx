@@ -5,6 +5,7 @@ import { useRecipeContext } from "@/components/recipe-context/recipe-context";
 import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
 import styles from "./RecipePage.module.css";
 import AdditionalInfo from "@/components/addition-info/additional-info";
+import SearchComponent from "@/components/search/search-component";
 
 export default function RecipePage() {
   const { selectedRecipe } = useRecipeContext();
@@ -66,9 +67,35 @@ export default function RecipePage() {
     console.log(`handleDiscard called for key: "${key}"`);
     setAdditionalInfo((prev) => {
       const newInfo = { ...prev };
-      delete newInfo[key]; // Remove the entry from the state
+      delete newInfo[key];
       return newInfo;
     });
+  };
+
+  const handleRecipeChange = async (changeRequest: string) => {
+    console.log(`handleRecipeChange called with request: "${changeRequest}"`);
+    if (!generatedRecipe) {
+      console.log("No generated recipe to modify");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const updatedRecipe = await together.regenerateRecipe(generatedRecipe, changeRequest);
+      if (updatedRecipe) {
+        setGeneratedRecipe(updatedRecipe);
+        // Clear additional info since the recipe has changed
+        setAdditionalInfo({});
+      } else {
+        setError("Failed to regenerate recipe");
+      }
+    } catch (err) {
+      setError("Failed to regenerate recipe");
+      console.error("Error regenerating recipe:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!selectedRecipe) {
@@ -77,7 +104,17 @@ export default function RecipePage() {
 
   return (
     <div className="spacing-large">
-      <h1 className="title1">{selectedRecipe.title}</h1>
+      <div className="spacing-medium">
+        <h1 className="title1">{selectedRecipe.title}</h1>
+
+        <div className={styles.regenerateSearchContainer}>
+          <SearchComponent
+            placeholderText="Make a change to the whole recipe..."
+            onSearchSubmit={handleRecipeChange}
+          />
+        </div>
+      </div>
+
       {loading && <p className="text">Loading recipe...</p>}
       {error && <p className="text">{error}</p>}
       {generatedRecipe ? (

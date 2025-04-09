@@ -82,3 +82,23 @@
   height: 16px;
   cursor: pointer;
 }
+
+/* Style for the SearchComponent when inside AdditionalInfo */
+.regenerateSearchContainer {
+  margin-top: 0.1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  height: 50px;
+  width: 100%; /* Reduce the width to make it smaller */
+}
+
+/* Style the input and button inside SearchComponent */
+.regenerateSearchContainer input {
+  padding: 0.25rem 0.5rem; /* Smaller padding for a more compact look */
+  font-size: 0.875rem; /* Smaller font size */
+}
+
+.regenerateSearchContainer button {
+  padding: 0.25rem 0.5rem; /* Smaller padding for the button */
+  font-size: 0.875rem; /* Smaller font size */
+}
