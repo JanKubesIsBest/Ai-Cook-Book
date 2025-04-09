@@ -42,7 +42,7 @@ export default function AdditionalInfo({ info, recipe, discard }: AdditionalInfo
             <span className="text">{info}</span>
             <div className={styles.searchContainer}>
               <SearchComponent
-                placeholderText="Some other questions?"
+                placeholderText="Type in your question..."
                 onSearchSubmit={handleSearch}
               />
             </div>

@@ -15,13 +15,6 @@
   position: relative; /* For positioning the discard icon */
 }
 
-@media (prefers-color-scheme: dark) {
-  .additionalInfo {
-    background-color: #333; /* Darker background for dark mode */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow in dark mode */
-  }
-}
-
 .additionalInfo.show {
   max-height: fit-content; /* Adjust as needed based on content */
   opacity: 1;
@@ -56,13 +49,6 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-}
-
-/* Ensure the discard icon is visible in both light and dark modes */
-@media (prefers-color-scheme: dark) {
-  .discardIcon {
-    filter: invert(1); /* Invert to white if the SVG is black */
-  }
 }
 
 /* Ensure the content doesn't overlap with the discard icon */

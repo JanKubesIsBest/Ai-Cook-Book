@@ -8,7 +8,7 @@ export interface RecipeItemProps {
   isLastItem?: boolean;
 }
 
-export interface Recipe { 
+export interface Recipe {
   id: number | null;
   title: string;
   descriptionItems: string;
@@ -16,7 +16,7 @@ export interface Recipe {
   procedure: string;
   procedureSteps: string[];
   isLastItem?: boolean;
-  onClick?: () => void; 
+  onClick?: () => void;
 }
 
 class TogetherAPI {
@@ -66,15 +66,15 @@ class TogetherAPI {
 
       Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {
     `;
-  
+
     // Call the Together API with the prompt
     const content = await this._callAPI(prompt);
-  
-    try {  
+
+    try {
       // Parse the API response as JSON
       const recipeData = JSON.parse(content);
 
-  
+
       // Validate the response format against the Recipe interface
       if (
         typeof recipeData.title === 'string' &&
@@ -117,9 +117,9 @@ class TogetherAPI {
 
        Respond only with the two sentences, nothing else. Each sentence should be about 5 words, so 10 words TOTAL!
     `;
-  
+
     const content = await this._callAPI(prompt);
-  
+
     return content || null; // Return the content or null if empty
   }
 
@@ -160,12 +160,12 @@ class TogetherAPI {
 
       Remember: THERE SHOULD NOT BE ANYTHING ELSE THAN THE JSON FILE. ONLY JSON. The text should start with { and end with }, so I can easily parse it to JSON. Don't start like this: JSON: . Start with this: {
     `;
-  
+
     const content = await this._callAPI(prompt);
-    
+
     try {
       const response = JSON.parse(content);
-  
+
       // Validate that the response has a "recipes" array and matches the Recipe interface
       if (
         Array.isArray(response.recipes) &&
@@ -193,8 +193,8 @@ class TogetherAPI {
   }
 
   // Inside TogetherAPI class
-async askFollowUpQuestion(question: string, recipe: Recipe, previousResponse: string): Promise<string | null> {
-  const prompt = `
+  async askFollowUpQuestion(question: string, recipe: Recipe, previousResponse: string): Promise<string | null> {
+    const prompt = `
     The user is asking a follow-up question about the recipe or the previous response. Here is the context:
 
     Recipe:
@@ -212,11 +212,11 @@ async askFollowUpQuestion(question: string, recipe: Recipe, previousResponse: st
   `;
 
 
-  const content = await this._callAPI(prompt);
-  
+    const content = await this._callAPI(prompt);
 
-  return content || null;
-}
+
+    return content || null;
+  }
 }
 
 export default TogetherAPI;
