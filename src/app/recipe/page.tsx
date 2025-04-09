@@ -13,7 +13,6 @@ export default function RecipePage() {
   const [error, setError] = useState<string | null>(null);
   const [additionalInfo, setAdditionalInfo] = useState<{ [key: string]: string }>({});
 
-  // Use a ref to track if the initial fetch has been performed
   const hasFetchedRecipe = useRef(false);
 
   const together = new TogetherAPI();
@@ -21,7 +20,6 @@ export default function RecipePage() {
   useEffect(() => {
     console.log("useEffect triggered in RecipePage");
 
-    // Prevent duplicate calls in Strict Mode
     if (hasFetchedRecipe.current) {
       console.log("Initial fetch already performed, skipping");
       return;
@@ -50,7 +48,7 @@ export default function RecipePage() {
 
     hasFetchedRecipe.current = true;
     fetchRecipe();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   const handleSearch = async (type: "ingredient" | "step", index: number, text: string) => {
     console.log(`handleSearch called for ${type} at index ${index}: "${text}"`);
@@ -64,20 +62,29 @@ export default function RecipePage() {
     }
   };
 
+  const handleDiscard = (key: string) => {
+    console.log(`handleDiscard called for key: "${key}"`);
+    setAdditionalInfo((prev) => {
+      const newInfo = { ...prev };
+      delete newInfo[key]; // Remove the entry from the state
+      return newInfo;
+    });
+  };
+
   if (!selectedRecipe) {
     return <p className="text">No recipe selected.</p>;
   }
 
   return (
     <div className="spacing-large">
-      <h1 className="title1 ">{selectedRecipe.title}</h1>
+      <h1 className="title1">{selectedRecipe.title}</h1>
       {loading && <p className="text">Loading recipe...</p>}
       {error && <p className="text">{error}</p>}
       {generatedRecipe ? (
         <div>
           <p className="text">{generatedRecipe.descriptionItems}</p>
 
-          <h3 className="title3 italic">Ingredients:</h3>
+          <h3 className="title3">Ingredients:</h3>
           <div className="padding-small">
             <ul className={styles.ingredientsList}>
               {generatedRecipe.items.map((item, index) => (
@@ -92,17 +99,21 @@ export default function RecipePage() {
                         onClick={() => handleSearch("ingredient", index, item)}
                       />
                     </div>
-                    <AdditionalInfo info={additionalInfo[`ingredient-${index}`]} recipe={generatedRecipe} />
+                    <AdditionalInfo
+                      info={additionalInfo[`ingredient-${index}`]}
+                      recipe={generatedRecipe}
+                      discard={() => handleDiscard(`ingredient-${index}`)}
+                    />
                   </div>
                 </li>
               ))}
             </ul>
           </div>
 
-          <h3 className="title3 italic">Procedure:</h3>
+          <h3 className="title3">Procedure:</h3>
           <p className="text">{generatedRecipe.procedure}</p>
 
-          <h3 className="title3 italic">Steps:</h3>
+          <h3 className="title3">Steps:</h3>
           <ol className={styles.stepsList}>
             {generatedRecipe.procedureSteps.map((step, index) => (
               <li key={index} className={styles.listItem}>
@@ -118,7 +129,11 @@ export default function RecipePage() {
                       />
                     </p>
                   </div>
-                  <AdditionalInfo info={additionalInfo[`step-${index}`]} recipe={generatedRecipe} />
+                  <AdditionalInfo
+                    info={additionalInfo[`step-${index}`]}
+                    recipe={generatedRecipe}
+                    discard={() => handleDiscard(`step-${index}`)}
+                  />
                 </div>
               </li>
             ))}

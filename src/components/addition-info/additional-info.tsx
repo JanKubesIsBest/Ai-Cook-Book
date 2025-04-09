@@ -1,15 +1,16 @@
-import { useState } from 'react';
-import { Recipe } from '@/utils/together-api/recipe-utils';
-import SearchComponent from '../search/search-component';
-import TogetherAPI from '@/utils/together-api/recipe-utils';
-import styles from './AdditionalInfo.module.css';
+import { useState } from "react";
+import { Recipe } from "@/utils/together-api/recipe-utils";
+import SearchComponent from "../search/search-component";
+import TogetherAPI from "@/utils/together-api/recipe-utils";
+import styles from "./AdditionalInfo.module.css";
 
 interface AdditionalInfoProps {
   info: string | undefined;
   recipe: Recipe;
+  discard: () => void; // Callback to remove the card
 }
 
-export default function AdditionalInfo({ info, recipe }: AdditionalInfoProps) {
+export default function AdditionalInfo({ info, recipe, discard }: AdditionalInfoProps) {
   const [followUpResponse, setFollowUpResponse] = useState<string | null>(null);
   const together = new TogetherAPI();
 
@@ -19,11 +20,11 @@ export default function AdditionalInfo({ info, recipe }: AdditionalInfoProps) {
         const response = await together.askFollowUpQuestion(query, recipe, info);
         setFollowUpResponse(response);
       } catch (err) {
-        console.error('Failed to fetch follow-up info:', err);
-        setFollowUpResponse('Sorry, something went wrong.');
+        console.error("Failed to fetch follow-up info:", err);
+        setFollowUpResponse("Sorry, something went wrong.");
       }
     } else {
-      console.log('No previous info available to ask a follow-up question.');
+      console.log("No previous info available to ask a follow-up question.");
     }
   };
 
@@ -31,16 +32,28 @@ export default function AdditionalInfo({ info, recipe }: AdditionalInfoProps) {
     <>
       {info && (
         <div className={`${styles.additionalInfo} ${styles.show}`}>
-          <span className="text">{info}</span>
-          <div className={styles.searchContainer}>
-            <SearchComponent
-              placeholderText="Some other questions?"
-              onSearchSubmit={handleSearch}
-            />
+          <img
+            src="/discard_icon.svg"
+            alt="Discard additional info"
+            className={styles.discardIcon}
+            onClick={discard} // Call the discard callback
+          />
+          <div className={styles.contentWrapper}>
+            <span className="text">{info}</span>
+            <div className={styles.searchContainer}>
+              <SearchComponent
+                placeholderText="Some other questions?"
+                onSearchSubmit={handleSearch}
+              />
+            </div>
+            {followUpResponse && (
+              <AdditionalInfo
+                info={followUpResponse}
+                recipe={recipe}
+                discard={() => setFollowUpResponse(null)} // Discard follow-up card
+              />
+            )}
           </div>
-          {followUpResponse && (
-            <AdditionalInfo info={followUpResponse} recipe={recipe} />
-          )}
         </div>
       )}
     </>
