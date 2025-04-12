@@ -23,7 +23,7 @@ class TogetherAPI {
   private together: Together;
 
   constructor() {
-    const key = process.env.TOGETHER_API_KEY;
+    const key = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
     if (!key) {
       throw new Error("API key is required");
     }
