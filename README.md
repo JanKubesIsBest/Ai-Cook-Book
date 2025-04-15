@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project overview 
+**AI wrappers, the future of all products!** 
 
-## Getting Started
+Just kidding, but this is my shot at the AI wrappers battlefield. 
 
-First, run the development server:
+Have you ever thought about making a meal for yourself? Something original, made from ingredients in your fridge, that you’d love to eat right now?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Searching for meals like this is almost impossible. So, use cook-book-ai!
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How app looks
+Search for your meal:
+<img width="1554" alt="Image" src="https://github.com/user-attachments/assets/ce4bc9ed-7f62-453c-a936-3901fb7627c4" />
+<img width="1554" alt="Image" src="https://github.com/user-attachments/assets/4de2e8d4-d40a-4360-97ef-6f4722af5151" />
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Enjoy the full recipe and search for additional info. Occasionally, you might want to change the entire recipe *(this might happen when the AI suggests store-bought items, like **nuggets**. You might want to make your own nuggets, which requires rewriting the entire recipe)*.
+<img width="1632" alt="Image" src="https://github.com/user-attachments/assets/0a2cfdc7-9d6b-4a5f-a49f-7ff0be51e7c3" />
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What are the plans for the project in the future?
+I definitely want to upload this version to the cloud, do a bit of marketing, and see if it achieves at least some success *(meaning I’d use it regularly 🤣)*.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then, I’d like to develop an iOS app, and later an Android app, and pair the concept with a meal ***coach*** *(I definitely don’t want it to just tell everyone what to do. It should be more of a user-friendly helper)*.
