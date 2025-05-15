@@ -6,7 +6,9 @@ import SearchComponent from "@/components/search/search-component";
 import RecipeItem from "@/components/recipe-item/recipe-item";
 import styles from "./page.module.css";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
-import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
+import TogetherAPI from "@/utils/together-api/recipe-utils";
+import { Recipe, RecipeItemProps } from "../../utils/together-api/interfaces";
+import { searchRecipe } from "@/utils/together-api/actions";
 
 function SearchPageContent() {
   const { searchResults, setSearchResults, setSelectedRecipe } = useRecipeContext();
@@ -21,8 +23,6 @@ function SearchPageContent() {
 
   // Use a ref to track if the initial search has been performed
   const hasPerformedInitialSearch = useRef(false);
-
-  const together = new TogetherAPI();
 
   const performSearch = useCallback(
     async (query: string) => {
@@ -61,7 +61,7 @@ function SearchPageContent() {
       setCurrentDisplayQuery(query);
 
       try {
-        const fetchedRecipes = await together.searchRecipe(query);
+        const fetchedRecipes = await searchRecipe(query)
         const recipesToSet: Recipe[] = fetchedRecipes || [];
         console.log(`Fetched ${recipesToSet.length} recipes for query: "${query}"`);
         setRecipes(recipesToSet);
@@ -115,7 +115,7 @@ function SearchPageContent() {
   const handleNewSearch = (newQuery: string) => {
     console.log(`handleNewSearch called with newQuery: "${newQuery}"`);
     performSearch(newQuery);
-    // Optional: Update URL without full page reload
+    
     window.history.pushState({}, '', `/search?q=${encodeURIComponent(newQuery)}`);
   };
 
