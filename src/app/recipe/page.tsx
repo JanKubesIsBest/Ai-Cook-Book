@@ -18,8 +18,6 @@ export default function RecipePage() {
 
   const hasFetchedRecipe = useRef(false);
 
-  const together = new TogetherAPI();
-
   useEffect(() => {
     console.log("useEffect triggered in RecipePage");
 

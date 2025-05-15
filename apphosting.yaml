@@ -11,6 +11,7 @@ runConfig:
 env:
   - variable: TOGETHER_API_KEY
     value: 9084a526808152ccd5058573c899c82d52fc9ee4da4788e4d6dca5126d772754
+    
   # Configure environment variables.
   # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
   # - variable: MESSAGE
