@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
-import TogetherAPI, { Recipe } from "@/utils/together-api/recipe-utils";
+import TogetherAPI from "@/utils/together-api/recipe-utils";
 import styles from "./RecipePage.module.css";
 import AdditionalInfo from "@/components/addition-info/additional-info";
 import SearchComponent from "@/components/search/search-component";
+import { askAboutIngredient, generateRecipe, regenerateRecipe } from "@/utils/together-api/actions";
+import { Recipe } from "../../utils/together-api/interfaces";
 
 export default function RecipePage() {
   const { selectedRecipe } = useRecipeContext();
@@ -37,7 +39,7 @@ export default function RecipePage() {
       setLoading(true);
       setError(null);
       try {
-        const recipe = await together.generateRecipe(selectedRecipe);
+        const recipe = await generateRecipe(selectedRecipe);
         setGeneratedRecipe(recipe);
       } catch (err) {
         setError("Failed to generate recipe");
@@ -55,7 +57,7 @@ export default function RecipePage() {
     console.log(`handleSearch called for ${type} at index ${index}: "${text}"`);
     if (generatedRecipe != null) {
       try {
-        const info = await together.askAboutIngredient(text, generatedRecipe);
+        const info = await askAboutIngredient(text, generatedRecipe)
         setAdditionalInfo((prev) => ({ ...prev, [`${type}-${index}`]: info ?? "" }));
       } catch (err) {
         console.error("Failed to fetch additional info:", err);
@@ -82,7 +84,7 @@ export default function RecipePage() {
     setLoading(true);
     setError(null);
     try {
-      const updatedRecipe = await together.regenerateRecipe(generatedRecipe, changeRequest);
+      const updatedRecipe = await regenerateRecipe(generatedRecipe, changeRequest);
       if (updatedRecipe) {
         setGeneratedRecipe(updatedRecipe);
         // Clear additional info since the recipe has changed

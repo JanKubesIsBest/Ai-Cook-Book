@@ -12,6 +12,7 @@ interface RecipeContextType {
 
 const RecipeContext = createContext<RecipeContextType | undefined>(undefined);
 
+// Recipe context provider - Ai
 export function RecipeProvider({ children }: { children: ReactNode }) {
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeItemProps | null>(null);
   const [searchResults, setSearchResults] = useState<Record<string, Recipe[] | null>>({});
