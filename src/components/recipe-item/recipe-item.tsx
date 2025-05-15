@@ -5,7 +5,7 @@ import React from 'react';
 import styles from './RecipeItem.module.css';
 import { useRouter } from 'next/navigation';
 import { useRecipeContext } from '../recipe-context/recipe-context';
-import { Recipe } from '@/utils/together-api/recipe-utils';
+import { Recipe } from "../../utils/together-api/interfaces";
 
 interface RecipeItemProps {
   title: string;
