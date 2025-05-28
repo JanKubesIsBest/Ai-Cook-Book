@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { RecipeItemProps, Recipe } from "@/utils/together-api/recipe-utils";
+import { Recipe, RecipeItemProps } from "../../utils/together-api/interfaces";
 
 interface RecipeContextType {
   selectedRecipe: RecipeItemProps | null;

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
-import TogetherAPI from "@/utils/together-api/recipe-utils";
 import styles from "./RecipePage.module.css";
 import AdditionalInfo from "@/components/addition-info/additional-info";
 import SearchComponent from "@/components/search/search-component";
@@ -151,30 +150,32 @@ export default function RecipePage() {
           <p className="text">{generatedRecipe.procedure}</p>
 
           <h3 className="title3">Steps:</h3>
-          <ol className={styles.stepsList}>
-            {generatedRecipe.procedureSteps.map((step, index) => (
-              <li key={index} className={styles.listItem}>
-                <div className={styles.stepWrapper}>
-                  <div className={styles.stepContent}>
-                    <p className="text">
-                      {step}
-                      <img
-                        src="/search.svg"
-                        alt="Search this step"
-                        className={styles.searchIcon}
-                        onClick={() => handleSearch("step", index, step)}
-                      />
-                    </p>
+          <div className="padding-small">
+            <ol className={styles.stepsList}>
+              {generatedRecipe.procedureSteps.map((step, index) => (
+                <li key={index} className={styles.listItem}>
+                  <div className={styles.stepWrapper}>
+                    <div className={styles.itemContent}>
+                      <p className="text">
+                        {step}
+                        <img
+                          src="/search.svg"
+                          alt="Search this step"
+                          className={styles.searchIcon}
+                          onClick={() => handleSearch("step", index, step)}
+                        />
+                      </p>
+                    </div>
+                    <AdditionalInfo
+                      info={additionalInfo[`step-${index}`]}
+                      recipe={generatedRecipe}
+                      discard={() => handleDiscard(`step-${index}`)}
+                    />
                   </div>
-                  <AdditionalInfo
-                    info={additionalInfo[`step-${index}`]}
-                    recipe={generatedRecipe}
-                    discard={() => handleDiscard(`step-${index}`)}
-                  />
-                </div>
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       ) : (
         !loading && !error && <p className="text">No detailed recipe generated yet.</p>
