@@ -1,6 +1,5 @@
 import { useState } from "react";
 import SearchComponent from "../search/search-component";
-import TogetherAPI from "@/utils/together-api/recipe-utils";
 import styles from "./AdditionalInfo.module.css";
 import { Recipe } from "../../utils/together-api/interfaces";
 import { askFollowUpQuestion } from "@/utils/together-api/actions";
