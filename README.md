@@ -18,4 +18,4 @@ Enjoy the full recipe and search for additional info. Occasionally, you might wa
 ## What are the plans for the project in the future?
 I definitely want to upload this version to the cloud, do a bit of marketing, and see if it achieves at least some success *(meaning I’d use it regularly 🤣)*.
 
-Then, I’d like to develop an iOS app, and later an Android app, and pair the concept with a meal ***coach*** *(I definitely don’t want it to just tell everyone what to do. It should be more of a user-friendly helper)*.
+Then, I’d like to develop an iOS app, and later an iPad app, since I think that that's what iPad is intended for: simple, every day tasks, preferably on native app *(because using web apps on iPad is pain)*.
