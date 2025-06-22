@@ -2,14 +2,22 @@ import { stringify } from "querystring";
 import Together from "together-ai";
 import { Recipe, RecipeItemProps } from "./interfaces";
 
+const togetherApiKey = process.env.TOGETHER_API_KEY;
+
 class TogetherAPI {
   private together: Together;
 
   constructor() {
-    const key = process.env.TOGETHER_API_KEY;
+    // Use console.error to make it red and add a unique version number.
+    console.error("--- CONSTRUCTOR CHECKPOINT --- Deployment Version 2.0 ---");
+
+    const key = togetherApiKey;
     if (!key) {
+      console.error("--- FATAL: No API key was found by the constructor. ---");
       throw new Error("API key is required");
     }
+
+    console.log(`--- SUCCESS: Initializing Together with a key ending in ...${key.slice(-4)}`);
     this.together = new Together({ apiKey: key });
   }
 
@@ -153,13 +161,15 @@ class TogetherAPI {
             r.procedureSteps.every((s: any) => typeof s === "string")
         )
       ) {
+
         return response.recipes as Recipe[];
       } else {
+        console.log("Failed to load recipes")
         throw new Error("Invalid recipes format");
       }
     } catch (error) {
       console.error("Failed to parse recipes:", error);
-      return null;
+      throw error
     }
   }
 
