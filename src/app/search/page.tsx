@@ -112,7 +112,7 @@ function SearchPageContent() {
       <Typography variant="h1" color="initial">
         {isLoading ? (
           <span>
-            Searching for recipes{loadingDots}
+            Searching for <br/> recipes{loadingDots}
           </span>
         ) : searchPerformed && recipes.length !== 0 ? (
           <span>
@@ -125,7 +125,7 @@ function SearchPageContent() {
         )}
       </Typography>
 
-      <Box sx={{ mb: 4 }}> {/* Margin bottom for spacing below search component */}
+      <Box sx={{mb: 1}}> 
         <SearchComponent
           placeholderText="Enter ingredients..."
           initialValue={initialQuery}

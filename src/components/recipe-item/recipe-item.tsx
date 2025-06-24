@@ -1,17 +1,24 @@
-// components/RecipeItem.tsx
 "use client";
 
 import React from 'react';
-import styles from './RecipeItem.module.css';
 import { useRouter } from 'next/navigation';
 import { useRecipeContext } from '../recipe-context/recipe-context';
 import { Recipe } from "../../utils/together-api/interfaces";
 
-interface RecipeItemProps {
+import {
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  List,
+  ListItem,
+  CardActionArea
+} from '@mui/material';
+
+interface SelectedRecipePayload {
   title: string;
   description: string;
   ingredients: string[];
-  isLastItem?: boolean;
 }
 
 const RecipeItem: React.FC<Recipe> = ({ title, descriptionItems, items, isLastItem = false }) => {
@@ -23,38 +30,83 @@ const RecipeItem: React.FC<Recipe> = ({ title, descriptionItems, items, isLastIt
   const secondColumnIngredients = items.slice(midPoint);
 
   const handleRecipeClick = () => {
-    const thisRecipeItem: RecipeItemProps = {
+    const selectedRecipePayload: SelectedRecipePayload = {
       title: title,
       description: descriptionItems,
       ingredients: items,
     };
-    setSelectedRecipe({ ...thisRecipeItem }); // Create a new object
+    setSelectedRecipe(selectedRecipePayload);
     router.push('/recipe');
   };
 
   return (
-    <div
-      className={`${styles.recipeItem} spacing-medium`}
-      onClick={handleRecipeClick} // Corrected onClick handler
-      style={{ cursor: 'pointer' }}
+    <Card
+      sx={{
+        mb: 2,
+        borderRadius: 2,
+        boxShadow: 3,
+        '&:hover': {
+          boxShadow: 6,
+        },
+      }}
     >
-      <h3 className={`${styles.recipeTitle} title3`}>{title}</h3>
-      <p className={`${styles.recipeDescription} text`}>{descriptionItems}</p>
-      <p className={`${styles.ingredientsTitle} text bold spacing-small`}>Crucial ingredients needed:</p>
-      <div className={styles.ingredientsGrid}>
-        <ul className={styles.ingredientsList}>
-          {firstColumnIngredients.map((ingredient, index) => (
-            <li key={`col1-${index}`} className="text">{ingredient}</li>
-          ))}
-        </ul>
-        <ul className={styles.ingredientsList}>
-          {secondColumnIngredients.map((ingredient, index) => (
-            <li key={`col2-${index}`} className="text">{ingredient}</li>
-          ))}
-        </ul>
-      </div>
-      {!isLastItem && <hr className={styles.separator} />}
-    </div>
+      <CardActionArea onClick={handleRecipeClick} sx={{ cursor: 'pointer' }}>
+        <CardContent>
+          <Typography
+            variant="h5"
+            component="h3"
+            gutterBottom
+            sx={{
+              fontWeight: 'bold',
+              color: 'primary.main',
+            }}
+          >
+            {title}
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{
+              mb: 1,
+            }}
+          >
+            {descriptionItems}
+          </Typography>
+
+          <Typography
+            variant="subtitle1"
+            component="p"
+            sx={{
+              fontWeight: 'bold',
+              mb: 0,
+            }}
+          >
+            Crucial ingredients needed:
+          </Typography>
+
+          <Grid container spacing={0}>
+            <Grid>
+              <List dense disablePadding sx={{listStyleType: 'disc', pl: 2 }}>
+                {firstColumnIngredients.map((ingredient, index) => (
+                  <ListItem key={`col1-${index}`} sx={{ display: 'list-item' }}>
+                    <Typography variant="body2">{ingredient}</Typography>
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
+            <Grid>
+              <List dense disablePadding sx={{listStyleType: 'disc', pl: 2 }}>
+                {secondColumnIngredients.map((ingredient, index) => (
+                  <ListItem key={`col1-${index}`} sx={{ display: 'list-item' }}>
+                    <Typography variant="body2">{ingredient}</Typography>
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 };
 

@@ -16,11 +16,24 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'sans-serif',
+    fontFamily: [
+      'Roboto',
+      'Arial',
+      'sans-serif',
+    ].join(','),
     h1: {
       fontFamily: '"Times New Roman", Times, serif',
     },
     h2: {
+      fontFamily: '"Times New Roman", Times, serif',
+    },
+    h3: {
+      fontFamily: '"Times New Roman", Times, serif',
+    },
+    h4: {
+      fontFamily: '"Times New Roman", Times, serif',
+    },
+    h5: {
       fontFamily: '"Times New Roman", Times, serif',
     },
     body1: {
