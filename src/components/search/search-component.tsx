@@ -1,4 +1,4 @@
-"use client"; // Directive for Next.js App Router Client Component
+"use client"; 
 
 import React, { useState } from 'react';
 import Container from '@mui/material/Container';
@@ -6,19 +6,31 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search'; // Using MUI's SearchIcon
+import { useRouter } from 'next/navigation';
 
 // Props interface
 interface SearchComponentProps {
   placeholderText: string;
-  onSearchSubmit: (query: string) => void;
+  onSearchSubmit?: (query: string) => void;
   initialValue?: string;
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
   placeholderText,
-  onSearchSubmit,
   initialValue = '',
+  onSearchSubmit
 }) => {
+  const router = useRouter();
+
+  const handleSearch = (query: string) => {
+    if (onSearchSubmit != null) {
+      onSearchSubmit(query)
+    } else {
+      console.log('Search submitted:', query);
+      router.push(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
+
   // State to manage the current value of the search input
   const [currentQuery, setCurrentQuery] = useState<string>(initialValue);
 
@@ -31,14 +43,14 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && currentQuery.trim()) {
       event.preventDefault(); // Prevent default form submission behavior
-      onSearchSubmit(currentQuery.trim()); // Call the submit handler with the trimmed query
+      handleSearch(currentQuery.trim()); // Call the submit handler with the trimmed query
     }
   };
 
   // Handle click on the search icon for submission
   const handleIconClick = () => {
     if (currentQuery.trim()) {
-      onSearchSubmit(currentQuery.trim()); // Call the submit handler with the trimmed query
+      handleSearch(currentQuery.trim()); // Call the submit handler with the trimmed query
     }
   };
 
