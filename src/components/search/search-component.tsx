@@ -7,7 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search'; // Using MUI's SearchIcon
 import { useRouter } from 'next/navigation';
-
+import { Stack, Button } from '@mui/material';
 // Props interface
 interface SearchComponentProps {
   placeholderText: string;
@@ -94,6 +94,21 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         // Aria label for the input field itself
         aria-label="search input"
       />
+
+                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+            <Button variant="outlined" >
+              <strong>Healthy</strong>
+            </Button>
+            <Button variant="outlined">
+              <strong>Low Calories</strong>
+            </Button>
+            <Button variant="outlined">
+              <strong>High Protein</strong>
+            </Button>
+            <Button variant="outlined">
+              <strong>Vegetarian</strong>
+            </Button>
+          </Stack>
     </Container>
   );
 };

@@ -17,9 +17,10 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Roboto',
-      'Arial',
-      'sans-serif',
+      'Helvetica Neue', // Prioritize Helvetica Neue
+      'Helvetica',      // Fallback to Helvetica
+      'Arial',          // Common sans-serif fallback
+      'sans-serif',     // Generic sans-serif fallback
     ].join(','),
     h1: {
       fontFamily: '"Times New Roman", Times, serif',
@@ -37,10 +38,28 @@ export const theme = createTheme({
       fontFamily: '"Times New Roman", Times, serif',
     },
     body1: {
-      fontFamily: 'sans-serif',
+      fontFamily: [
+        'Helvetica Neue',
+        'Helvetica',
+        'Arial',
+        'sans-serif',
+      ].join(','),
+    },
+    body2: { // Often good to explicitly set body2 as well if used
+      fontFamily: [
+        'Helvetica Neue',
+        'Helvetica',
+        'Arial',
+        'sans-serif',
+      ].join(','),
     },
     button: {
-      fontFamily: 'sans-serif',
+      fontFamily: [
+        'Helvetica Neue',
+        'Helvetica',
+        'Arial',
+        'sans-serif',
+      ].join(','),
       textTransform: 'none', // Optional: avoids uppercase buttons
     },
   },
