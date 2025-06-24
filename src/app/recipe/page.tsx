@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
-import styles from "./RecipePage.module.css";
-import AdditionalInfo from "@/components/addition-info/additional-info";
-import SearchComponent from "@/components/search/search-component";
+import AdditionalInfo from "@/components/addition-info/additional-info"; // Assuming this is MUI-compatible or handles its own styling
+import SearchComponent from "@/components/search/search-component"; // Already refactored to MUI
 import { askAboutIngredient, generateRecipe, regenerateRecipe } from "@/utils/together-api/actions";
 import { Recipe } from "../../utils/together-api/interfaces";
+
+// MUI Imports
+import { Box, Typography, Container, List, ListItem, IconButton } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AskAiButton from "@/components/custom-buttons/ask-ai-button/askAiButton";
 
 export default function RecipePage() {
   const { selectedRecipe } = useRecipeContext();
@@ -18,21 +22,16 @@ export default function RecipePage() {
   const hasFetchedRecipe = useRef(false);
 
   useEffect(() => {
-    console.log("useEffect triggered in RecipePage");
-
     if (hasFetchedRecipe.current) {
-      console.log("Initial fetch already performed, skipping");
       return;
     }
 
     if (!selectedRecipe) {
-      console.log("No selected recipe, resetting state");
       setGeneratedRecipe(null);
       return;
     }
 
     const fetchRecipe = async () => {
-      console.log(`fetchRecipe called for recipe: "${selectedRecipe.title}"`);
       setLoading(true);
       setError(null);
       try {
@@ -48,13 +47,12 @@ export default function RecipePage() {
 
     hasFetchedRecipe.current = true;
     fetchRecipe();
-  }, []);
+  }, [selectedRecipe]); // Added selectedRecipe to dependencies to re-fetch if it changes
 
   const handleSearch = async (type: "ingredient" | "step", index: number, text: string) => {
-    console.log(`handleSearch called for ${type} at index ${index}: "${text}"`);
     if (generatedRecipe != null) {
       try {
-        const info = await askAboutIngredient(text, generatedRecipe)
+        const info = await askAboutIngredient(text, generatedRecipe);
         setAdditionalInfo((prev) => ({ ...prev, [`${type}-${index}`]: info ?? "" }));
       } catch (err) {
         console.error("Failed to fetch additional info:", err);
@@ -63,7 +61,6 @@ export default function RecipePage() {
   };
 
   const handleDiscard = (key: string) => {
-    console.log(`handleDiscard called for key: "${key}"`);
     setAdditionalInfo((prev) => {
       const newInfo = { ...prev };
       delete newInfo[key];
@@ -72,9 +69,7 @@ export default function RecipePage() {
   };
 
   const handleRecipeChange = async (changeRequest: string) => {
-    console.log(`handleRecipeChange called with request: "${changeRequest}"`);
     if (!generatedRecipe) {
-      console.log("No generated recipe to modify");
       return;
     }
 
@@ -84,8 +79,7 @@ export default function RecipePage() {
       const updatedRecipe = await regenerateRecipe(generatedRecipe, changeRequest);
       if (updatedRecipe) {
         setGeneratedRecipe(updatedRecipe);
-        // Clear additional info since the recipe has changed
-        setAdditionalInfo({});
+        setAdditionalInfo({}); // Clear additional info since the recipe has changed
       } else {
         setError("Failed to regenerate recipe");
       }
@@ -98,88 +92,120 @@ export default function RecipePage() {
   };
 
   if (!selectedRecipe) {
-    return <p className="text">No recipe selected.</p>;
+    return (
+      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center' }}>
+        <Typography variant="body1">No recipe selected.</Typography>
+      </Container>
+    );
   }
 
   return (
-    <div className="spacing-large">
-      <div className="spacing-medium">
-        <h1 className="title1">{selectedRecipe.title}</h1>
+    <Container maxWidth="md" sx={{ py: 4 }}> {/* Main container with vertical padding */}
+      <Box sx={{ mb: 4 }}> {/* Spacing below title and search */}
+        <Typography variant="h3" component="h1" gutterBottom> {/* Title style and semantic tag */}
+          {selectedRecipe.title}
+        </Typography>
 
-        <div className={styles.regenerateSearchContainer}>
+        <Box sx={{ mb: 2 }}> {/* Spacing below search component */}
           <SearchComponent
             placeholderText="Make a change to the whole recipe..."
             onSearchSubmit={handleRecipeChange}
           />
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      {loading && <p className="text">Loading recipe...</p>}
-      {error && <p className="text">{error}</p>}
-      {generatedRecipe ? (
-        <div>
-          <p className="text">{generatedRecipe.descriptionItems}</p>
-
-          <h3 className="title3">Ingredients:</h3>
-          <div className="padding-small">
-            <ul className={styles.ingredientsList}>
-              {generatedRecipe.items.map((item, index) => (
-                <li key={index} className={styles.listItem}>
-                  <div className={styles.itemWrapper}>
-                    <div className={styles.itemContent}>
-                      <p className="text">{item}</p>
-                      <img
-                        src="/search.svg"
-                        alt="Search this ingredient"
-                        className={styles.searchIcon}
-                        onClick={() => handleSearch("ingredient", index, item)}
-                      />
-                    </div>
-                    <AdditionalInfo
-                      info={additionalInfo[`ingredient-${index}`]}
-                      recipe={generatedRecipe}
-                      discard={() => handleDiscard(`ingredient-${index}`)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <h3 className="title3">Procedure:</h3>
-          <p className="text">{generatedRecipe.procedure}</p>
-
-          <h3 className="title3">Steps:</h3>
-          <div className="padding-small">
-            <ol className={styles.stepsList}>
-              {generatedRecipe.procedureSteps.map((step, index) => (
-                <li key={index} className={styles.listItem}>
-                  <div className={styles.stepWrapper}>
-                    <div className={styles.itemContent}>
-                      <p className="text">
-                        {step}
-                        <img
-                          src="/search.svg"
-                          alt="Search this step"
-                          className={styles.searchIcon}
-                          onClick={() => handleSearch("step", index, step)}
-                        />
-                      </p>
-                    </div>
-                    <AdditionalInfo
-                      info={additionalInfo[`step-${index}`]}
-                      recipe={generatedRecipe}
-                      discard={() => handleDiscard(`step-${index}`)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      ) : (
-        !loading && !error && <p className="text">No detailed recipe generated yet.</p>
+      {loading && (
+        <Typography variant="body1" sx={{ textAlign: 'center', my: 2 }}>
+          Loading recipe...
+        </Typography>
       )}
-    </div>
+      {error && (
+        <Typography variant="body1" color="error" sx={{ textAlign: 'center', my: 2 }}>
+          {error}
+        </Typography>
+      )}
+
+      {generatedRecipe ? (
+        <Box>
+          <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}> {/* Use pre-line for newlines */}
+            {generatedRecipe.descriptionItems}
+          </Typography>
+
+          <Typography variant="h4" component="h3" gutterBottom> {/* Title style and semantic tag */}
+            Ingredients:
+          </Typography>
+          <Box sx={{ pl: 2, mb: 1 }}> {/* Padding-left for list bullets, margin-bottom */}
+            <List disablePadding sx={{ listStyleType: 'disc' }}> {/* Enable disc bullets */}
+              {generatedRecipe.items.map((item, index) => (
+                <ListItem key={index} disableGutters sx={{ display: 'list-item', mb: 0 }}> {/* List item styling */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    <Typography variant="body1" sx={{ flexGrow: 1, mr: 1, whiteSpace: 'pre-line' }}>
+                      <strong>{item}</strong>
+                    </Typography>
+                    <IconButton
+                      aria-label="Search this ingredient"
+                      onClick={() => handleSearch("ingredient", index, item)}
+                      size="small"
+                      sx={{ color: 'primary.main' }}
+                    >
+                      <SearchIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                  <AdditionalInfo
+                    info={additionalInfo[`ingredient-${index}`]}
+                    recipe={generatedRecipe}
+                    discard={() => handleDiscard(`ingredient-${index}`)}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+
+          <Typography variant="h4" component="h3" gutterBottom>
+            Procedure:
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
+            {generatedRecipe.procedure}
+          </Typography>
+
+          <Typography variant="h4" component="h3" gutterBottom>
+            Steps:
+          </Typography>
+          <Box sx={{ pl: 2, mb: 1 }}> {/* Padding-left for list numbers, margin-bottom */}
+            <List disablePadding component="ol" sx={{ listStyleType: 'decimal' }}> {/* Enable decimal numbers */}
+              {generatedRecipe.procedureSteps.map((step, index) => (
+                <ListItem key={index} disableGutters sx={{ display: 'list-item', mb: 0 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' }, // Stack on xs, row on sm and up
+                      alignItems: { xs: 'flex-start', sm: 'center' }, // Align start on mobile, center on desktop
+                      width: '100%',
+                      gap: { xs: 1, sm: 1 }, // Gap between items
+                    }}
+                  >
+                    <Typography variant="body1" sx={{ flexGrow: 1, mr: 1, whiteSpace: 'pre-line' }}>
+                      {step}
+                    </Typography>
+                    <AskAiButton onClick={() => handleSearch("step", index, step)} buttonText="Ask Ai" />
+                  </Box>
+                  <AdditionalInfo
+                    info={additionalInfo[`step-${index}`]}
+                    recipe={generatedRecipe}
+                    discard={() => handleDiscard(`step-${index}`)}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Box>
+      ) : (
+        !loading && !error && (
+          <Typography variant="body1" sx={{ textAlign: 'center', my: 2 }}>
+            No detailed recipe generated yet.
+          </Typography>
+        )
+      )}
+    </Container>
   );
 }
