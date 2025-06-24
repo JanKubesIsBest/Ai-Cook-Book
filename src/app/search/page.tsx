@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import SearchComponent from "@/components/search/search-component";
-import RecipeItem from "@/components/recipe-item/recipe-item";
-import styles from "./page.module.css";
+import SearchComponent from "@/components/search/search-component"; // Assuming this is now fully MUI
+import RecipeItem from "@/components/recipe-item/recipe-item"; // Assuming this is either MUI or its styling is handled internally
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
-import TogetherAPI from "@/utils/together-api/recipe-utils";
-import { Recipe, RecipeItemProps } from "../../utils/together-api/interfaces";
 import { searchRecipe } from "@/utils/together-api/actions";
+import { Recipe } from "../../utils/together-api/interfaces";
+
+// MUI Imports
+import { Box, Typography, Container } from '@mui/material';
 
 function SearchPageContent() {
   const { searchResults, setSearchResults, setSelectedRecipe } = useRecipeContext();
@@ -21,15 +22,11 @@ function SearchPageContent() {
   const [searchPerformed, setSearchPerformed] = useState<boolean>(false);
   const [currentDisplayQuery, setCurrentDisplayQuery] = useState<string>(initialQuery);
 
-  // Use a ref to track if the initial search has been performed
   const hasPerformedInitialSearch = useRef(false);
 
   const performSearch = useCallback(
     async (query: string) => {
-      console.log(`performSearch called with query: "${query}"`);
-
       if (!query) {
-        console.log("Query is empty, resetting state");
         setRecipes([]);
         setSearchPerformed(true);
         setIsLoading(false);
@@ -37,15 +34,9 @@ function SearchPageContent() {
         return;
       }
 
-      // If the query differs from the current display query, force a new search
-      console.log("Old query:", currentDisplayQuery);
-      console.log("New query:", query);
       const differentQuery = query !== currentDisplayQuery;
-      console.log("Different query?:", differentQuery);
 
-      // Check if results are already cached and the query hasn't changed
       if (!differentQuery && searchResults[query] !== undefined) {
-        console.log(`Using cached results for query: "${query}"`);
         setRecipes(searchResults[query] || []);
         setSearchPerformed(true);
         setIsLoading(false);
@@ -53,45 +44,36 @@ function SearchPageContent() {
         return;
       }
 
-      // Perform a new search if the query is different or not cached
-      console.log(`Performing new search for query: "${query}"`);
       setSearchPerformed(true);
       setIsLoading(true);
       setRecipes([]);
       setCurrentDisplayQuery(query);
 
       try {
-        const fetchedRecipes = await searchRecipe(query)
+        const fetchedRecipes = await searchRecipe(query);
         const recipesToSet: Recipe[] = fetchedRecipes || [];
-        console.log(`Fetched ${recipesToSet.length} recipes for query: "${query}"`);
         setRecipes(recipesToSet);
-        setSearchResults(query, recipesToSet); // Cache the results
+        setSearchResults(query, recipesToSet);
       } catch (error) {
         console.error("Search failed:", error);
         setRecipes([]);
-        setSearchResults(query, []); // Cache empty results on error
+        setSearchResults(query, []);
       } finally {
         setIsLoading(false);
       }
     },
-    [searchResults, setSearchResults] // Removed currentDisplayQuery from dependencies
+    [searchResults, setSearchResults, currentDisplayQuery] // Added currentDisplayQuery to dependencies
   );
 
   useEffect(() => {
-    console.log(`useEffect triggered with initialQuery: "${initialQuery}"`);
-
-    // Prevent duplicate calls in Strict Mode
     if (hasPerformedInitialSearch.current) {
-      console.log("Initial search already performed, skipping");
       return;
     }
 
     if (initialQuery) {
-      console.log(`Performing initial search for query: "${initialQuery}"`);
       hasPerformedInitialSearch.current = true;
       performSearch(initialQuery);
     } else {
-      console.log("No initial query, resetting state");
       setSearchPerformed(false);
       setRecipes([]);
       setCurrentDisplayQuery("");
@@ -113,14 +95,11 @@ function SearchPageContent() {
   }, [isLoading]);
 
   const handleNewSearch = (newQuery: string) => {
-    console.log(`handleNewSearch called with newQuery: "${newQuery}"`);
     performSearch(newQuery);
-    
     window.history.pushState({}, '', `/search?q=${encodeURIComponent(newQuery)}`);
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
-    console.log(`handleRecipeClick called for recipe: "${recipe.title}"`);
     setSelectedRecipe({
       title: recipe.title,
       description: recipe.descriptionItems,
@@ -129,26 +108,30 @@ function SearchPageContent() {
   };
 
   return (
-    <main>
-      <div className="not-bold title1 text-start spacing-large italic">
+    <Container maxWidth="md">
+      <Typography variant="h1" color="initial">
         {isLoading ? (
-          <h1 className={styles.loadingText}>
+          <span>
             Searching for recipes{loadingDots}
-          </h1>
+          </span>
         ) : searchPerformed && recipes.length !== 0 ? (
-          <h1>I got plenty of options for you...</h1>
+          <span>
+            I got plenty of options for you...
+          </span>
         ) : (
-          <h1>Error occurred.</h1>
+          <span>
+            Error occurred.
+          </span>
         )}
-      </div>
+      </Typography>
 
-      <div className="spacing-large">
+      <Box sx={{ mb: 4 }}> {/* Margin bottom for spacing below search component */}
         <SearchComponent
           placeholderText="Enter ingredients..."
           initialValue={initialQuery}
           onSearchSubmit={handleNewSearch}
         />
-      </div>
+      </Box>
 
       {recipes.map((recipe, index) => (
         <RecipeItem
@@ -157,18 +140,22 @@ function SearchPageContent() {
           title={recipe.title}
           descriptionItems={recipe.descriptionItems}
           items={recipe.items}
-          procedure=""
-          procedureSteps={[]}
+          procedure="" // Assuming these props are intentionally empty for now
+          procedureSteps={[]} // Assuming these props are intentionally empty for now
           onClick={() => handleRecipeClick(recipe)}
         />
       ))}
-    </main>
+    </Container>
   );
 }
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="title2 text-center padding-large">Loading search...</div>}>
+    <Suspense fallback={
+      <Box sx={{ textAlign: 'center', p: 4 }}> {/* MUI styling for fallback */}
+        <Typography variant="h5">Loading search...</Typography>
+      </Box>
+    }>
       <SearchPageContent />
     </Suspense>
   );
