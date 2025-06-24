@@ -1,8 +1,6 @@
-'use client';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
-import { createTheme } from '@mui/material/styles';
-
-export const theme = createTheme({
+let theme = createTheme({ // Use 'let' so we can reassign after responsiveFontSizes
   palette: {
     primary: {
       main: '#00AD1D', // Vibrant green
@@ -17,10 +15,10 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Helvetica Neue', // Prioritize Helvetica Neue
-      'Helvetica',      // Fallback to Helvetica
-      'Arial',          // Common sans-serif fallback
-      'sans-serif',     // Generic sans-serif fallback
+      'Helvetica Neue',
+      'Helvetica',
+      'Arial',
+      'sans-serif',
     ].join(','),
     h1: {
       fontFamily: '"Times New Roman", Times, serif',
@@ -45,7 +43,7 @@ export const theme = createTheme({
         'sans-serif',
       ].join(','),
     },
-    body2: { // Often good to explicitly set body2 as well if used
+    body2: {
       fontFamily: [
         'Helvetica Neue',
         'Helvetica',
@@ -60,16 +58,21 @@ export const theme = createTheme({
         'Arial',
         'sans-serif',
       ].join(','),
-      textTransform: 'none', // Optional: avoids uppercase buttons
+      textTransform: 'none',
     },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8, // Softer button corners
+          borderRadius: 8,
         },
       },
     },
   },
 });
+
+// Apply responsive font sizes to the theme
+theme = responsiveFontSizes(theme);
+
+export { theme };
