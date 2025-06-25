@@ -17,6 +17,7 @@
     "dotenv": "^16.4.7",
     "firebase-functions": "^6.3.2",
     "next": "15.2.4",
+    "nextjs-google-analytics": "^2.3.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "together-ai": "^0.13.0"
