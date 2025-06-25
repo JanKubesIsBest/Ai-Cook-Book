@@ -26,7 +26,7 @@ export default function Home() {
               position: 'absolute', // Position absolutely within the Stack
               width: { xs: '80%', sm: '60%', md: '50%' }, // Responsive width for the logo
               maxWidth: '400px', // Maximum width for the logo
-              opacity: 0.1, // Adjust opacity for a watermark effect
+              opacity: 0.4, 
               zIndex: 0, // Ensure it's behind the text
               top: '30%', 
               left: '5%', 

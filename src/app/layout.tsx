@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { RecipeProvider } from "@/components/recipe-context/recipe-context";
 import { StyledRoot } from "./createEmotionCache";
+import GoogleAnalytics from "./GoogleAnalytics";
 
 // const metadata: Metadata = {
 //   title: "GPT Cook Book",
@@ -17,6 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <GoogleAnalytics />
       <link rel="icon" href="/icon.ico" sizes="any"/>
       <body>
         <StyledRoot>
