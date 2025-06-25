@@ -18,9 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <GoogleAnalytics />
       <link rel="icon" href="/icon.ico" sizes="any"/>
       <body>
+        <GoogleAnalytics />
         <StyledRoot>
           <RecipeProvider>{children}</RecipeProvider>
         </StyledRoot>
