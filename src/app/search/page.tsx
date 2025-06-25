@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import SearchComponent from "@/components/search/search-component"; // Assuming this is now fully MUI
-import RecipeItem from "@/components/recipe-item/recipe-item"; // Assuming this is either MUI or its styling is handled internally
+import SearchComponent from "@/components/search/search-component";
+import RecipeItem from "@/components/recipe-item/recipe-item";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
 import { searchRecipe } from "@/utils/together-api/actions";
 import { Recipe } from "../../utils/together-api/interfaces";
@@ -14,33 +14,48 @@ import { Box, Typography, Container } from '@mui/material';
 function SearchPageContent() {
   const { searchResults, setSearchResults, setSelectedRecipe } = useRecipeContext();
   const searchParams = useSearchParams();
+
+  // Retrieve initial query and styles from URL
   const initialQuery = searchParams.get("q") || "";
+  const initialStylesParam = searchParams.get("styles");
+  const initialStyles = initialStylesParam ? initialStylesParam.split(',') : [];
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingDots, setLoadingDots] = useState<string>("");
   const [searchPerformed, setSearchPerformed] = useState<boolean>(false);
   const [currentDisplayQuery, setCurrentDisplayQuery] = useState<string>(initialQuery);
+  // Keep track of current styles for display purposes and to prevent re-search
+  const [currentDisplayStyles, setCurrentDisplayStyles] = useState<string[]>(initialStyles);
 
   const hasPerformedInitialSearch = useRef(false);
 
+  // performSearch - NOW ACCEPTS STYLES
   const performSearch = useCallback(
-    async (query: string) => {
-      if (!query) {
+    async (query: string, styles: string[] = []) => { // Default styles to empty array
+      const combinedQuery = styles.length > 0
+        ? `${query} styles:${styles.join(',')}` // Format: "query styles:style1,style2"
+        : query;
+
+      if (!combinedQuery) { // Check for empty combined query
         setRecipes([]);
         setSearchPerformed(true);
         setIsLoading(false);
         setCurrentDisplayQuery("");
+        setCurrentDisplayStyles([]); // Reset styles on empty search
         return;
       }
 
+      // Determine if a new search is needed based on query AND styles
       const differentQuery = query !== currentDisplayQuery;
+      const differentStyles = JSON.stringify(styles.sort()) !== JSON.stringify(currentDisplayStyles.sort());
 
-      if (!differentQuery && searchResults[query] !== undefined) {
-        setRecipes(searchResults[query] || []);
+      if (!differentQuery && !differentStyles && searchResults[combinedQuery] !== undefined) {
+        setRecipes(searchResults[combinedQuery] || []);
         setSearchPerformed(true);
         setIsLoading(false);
         setCurrentDisplayQuery(query);
+        setCurrentDisplayStyles(styles);
         return;
       }
 
@@ -48,37 +63,43 @@ function SearchPageContent() {
       setIsLoading(true);
       setRecipes([]);
       setCurrentDisplayQuery(query);
+      setCurrentDisplayStyles(styles); // Set the styles being searched for
 
       try {
-        const fetchedRecipes = await searchRecipe(query);
+        // Pass the formatted query to searchRecipe
+        const fetchedRecipes = await searchRecipe(combinedQuery);
         const recipesToSet: Recipe[] = fetchedRecipes || [];
         setRecipes(recipesToSet);
-        setSearchResults(query, recipesToSet);
+        setSearchResults(combinedQuery, recipesToSet); // Store results with combined query
       } catch (error) {
         console.error("Search failed:", error);
         setRecipes([]);
-        setSearchResults(query, []);
+        setSearchResults(combinedQuery, []); // Store empty results for combined query
       } finally {
         setIsLoading(false);
       }
     },
-    [searchResults, setSearchResults, currentDisplayQuery] // Added currentDisplayQuery to dependencies
+    [searchResults, setSearchResults, currentDisplayQuery, currentDisplayStyles]
   );
 
+  // useEffect - UPDATED to retrieve initial styles and pass them
   useEffect(() => {
+    // Check if initial search has already been performed to prevent re-running on subsequent renders
+    // that don't involve a true URL change.
     if (hasPerformedInitialSearch.current) {
       return;
     }
 
-    if (initialQuery) {
+    if (initialQuery || initialStyles.length > 0) { // Trigger initial search if query or styles exist
       hasPerformedInitialSearch.current = true;
-      performSearch(initialQuery);
+      performSearch(initialQuery, initialStyles);
     } else {
       setSearchPerformed(false);
       setRecipes([]);
       setCurrentDisplayQuery("");
+      setCurrentDisplayStyles([]); // Ensure styles are reset if no initial params
     }
-  }, [initialQuery, performSearch]);
+  }, [initialQuery, initialStyles, performSearch]); // Dependencies include initialStyles
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
@@ -94,9 +115,15 @@ function SearchPageContent() {
     };
   }, [isLoading]);
 
-  const handleNewSearch = (newQuery: string) => {
-    performSearch(newQuery);
-    window.history.pushState({}, '', `/search?q=${encodeURIComponent(newQuery)}`);
+  // handleNewSearch - NOW ACCEPTS STYLES AND UPDATES URL
+  const handleNewSearch = (newQuery: string, newStyles: string[]) => {
+    performSearch(newQuery, newStyles);
+
+    const encodedQuery = encodeURIComponent(newQuery);
+    const encodedStyles = newStyles.length > 0
+      ? `&styles=${encodeURIComponent(newStyles.join(','))}`
+      : '';
+    window.history.pushState({}, '', `/search?q=${encodedQuery}${encodedStyles}`);
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
@@ -125,10 +152,11 @@ function SearchPageContent() {
         )}
       </Typography>
 
-      <Box sx={{mb: 1}}> 
+      <Box sx={{mb: 1}}>
         <SearchComponent
           placeholderText="Enter ingredients..."
           initialValue={initialQuery}
+          initialSelectedStyles={initialStyles} // Pass retrieved styles to SearchComponent
           onSearchSubmit={handleNewSearch}
         />
       </Box>
@@ -140,8 +168,8 @@ function SearchPageContent() {
           title={recipe.title}
           descriptionItems={recipe.descriptionItems}
           items={recipe.items}
-          procedure="" // Assuming these props are intentionally empty for now
-          procedureSteps={[]} // Assuming these props are intentionally empty for now
+          procedure=""
+          procedureSteps={[]}
           onClick={() => handleRecipeClick(recipe)}
         />
       ))}
@@ -152,7 +180,7 @@ function SearchPageContent() {
 export default function SearchPage() {
   return (
     <Suspense fallback={
-      <Box sx={{ textAlign: 'center', p: 4 }}> {/* MUI styling for fallback */}
+      <Box sx={{ textAlign: 'center', p: 4 }}>
         <Typography variant="h5">Loading search...</Typography>
       </Box>
     }>

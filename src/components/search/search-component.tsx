@@ -7,29 +7,38 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import { useRouter } from 'next/navigation';
-import { Stack, Button, Box } from '@mui/material'; // Import Box for scrollable container
+import { Stack, Button, Box } from '@mui/material';
 
+// Props interface - UPDATED to include initialSelectedStyles
 interface SearchComponentProps {
   placeholderText: string;
-  onSearchSubmit?: (query: string) => void;
+  onSearchSubmit?: (query: string, styles: string[]) => void;
   initialValue?: string;
+  initialSelectedStyles?: string[]; // New prop for initial selected buttons
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
   placeholderText,
   initialValue = '',
-  onSearchSubmit
+  onSearchSubmit,
+  initialSelectedStyles = [] // Default to an empty array if not provided
 }) => {
   const router = useRouter();
   const [currentQuery, setCurrentQuery] = useState<string>(initialValue);
-  const [selectedButtons, setSelectedButtons] = useState<string[]>([]); // State to track selected buttons
+  // Initialize selectedButtons state with initialSelectedStyles
+  const [selectedButtons, setSelectedButtons] = useState<string[]>(initialSelectedStyles);
 
   const handleSearch = (query: string) => {
     if (onSearchSubmit != null) {
-      onSearchSubmit(query);
+      onSearchSubmit(query, selectedButtons); // Pass both query and selectedButtons
     } else {
-      console.log('Search submitted:', query);
-      router.push(`/search?q=${encodeURIComponent(query)}`);
+      console.log('Search submitted:', query, 'with styles:', selectedButtons);
+      // Constructing the URL with styles
+      const encodedQuery = encodeURIComponent(query);
+      const encodedStyles = selectedButtons.length > 0
+        ? `&styles=${encodeURIComponent(selectedButtons.join(','))}` // Join styles with comma
+        : '';
+      router.push(`/search?q=${encodedQuery}${encodedStyles}`);
     }
   };
 
