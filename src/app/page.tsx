@@ -31,7 +31,7 @@ export default function Home() {
         </Box>
 
         <Grid container columnSpacing={4} rowSpacing={1} justifyContent="center">
-          <Grid xs={12} sm={6} md={6} lg={6}>
+          <Grid >
             <WhyUseAppCard
               icon={'🥦'}
               title={'What ingredients would you like to use?'}
@@ -40,7 +40,7 @@ export default function Home() {
               gradientColorEnd="#00E026"
             />
           </Grid>
-          <Grid xs={12} sm={6} md={6} lg={6}>
+          <Grid  >
             <WhyUseAppCard
               icon={'🍕'}
               title={'What do you fancy?'}
@@ -49,7 +49,7 @@ export default function Home() {
               gradientColorEnd="#F44336"   
             />
           </Grid>
-          <Grid xs={12} sm={6} md={6} lg={6}>
+          <Grid >
             <WhyUseAppCard
               icon={'🏋️'}
               title={'What is your nutritional goal?'}
@@ -58,7 +58,7 @@ export default function Home() {
               gradientColorEnd="#4CAF50"   // Example: Green for fitness
             />
           </Grid>
-          <Grid xs={12} sm={6} md={6} lg={6}>
+          <Grid>
             <WhyUseAppCard
               icon={'🍊'}
               title={'Are you lost in a recipe?'}
