@@ -142,14 +142,7 @@ export default function RecipePage() {
                     <Typography variant="body1" sx={{ flexGrow: 1, mr: 1, whiteSpace: 'pre-line' }}>
                       <strong>{item}</strong>
                     </Typography>
-                    <IconButton
-                      aria-label="Search this ingredient"
-                      onClick={() => handleSearch("ingredient", index, item)}
-                      size="small"
-                      sx={{ color: 'primary.main' }}
-                    >
-                      <SearchIcon fontSize="small" />
-                    </IconButton>
+                    <AskAiButton onClick={() => handleSearch("ingredient", index, item)} buttonText="Ask Ai"/>
                   </Box>
                   <AdditionalInfo
                     info={additionalInfo[`ingredient-${index}`]}
@@ -175,7 +168,7 @@ export default function RecipePage() {
             <List disablePadding component="ol" sx={{ listStyleType: 'decimal' }}> {/* Enable decimal numbers */}
               {generatedRecipe.procedureSteps.map((step, index) => (
                 <ListItem key={index} disableGutters sx={{ display: 'list-item', mb: 0 }}>
-                  <Box
+                                    <Box
                     sx={{
                       display: 'flex',
                       flexDirection: { xs: 'column', sm: 'row' }, // Stack on xs, row on sm and up
@@ -187,7 +180,7 @@ export default function RecipePage() {
                     <Typography variant="body1" sx={{ flexGrow: 1, mr: 1, whiteSpace: 'pre-line' }}>
                       {step}
                     </Typography>
-                    <AskAiButton onClick={() => handleSearch("step", index, step)} buttonText="Ask Ai" />
+                    <AskAiButton onClick={() => handleSearch("step", index, step)} buttonText="Ask Ai"/>
                   </Box>
                   <AdditionalInfo
                     info={additionalInfo[`step-${index}`]}

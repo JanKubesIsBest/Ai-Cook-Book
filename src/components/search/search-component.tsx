@@ -1,14 +1,14 @@
-"use client"; 
+"use client";
 
 import React, { useState } from 'react';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search'; // Using MUI's SearchIcon
+import SearchIcon from '@mui/icons-material/Search';
 import { useRouter } from 'next/navigation';
-import { Stack, Button } from '@mui/material';
-// Props interface
+import { Stack, Button, Box } from '@mui/material'; // Import Box for scrollable container
+
 interface SearchComponentProps {
   placeholderText: string;
   onSearchSubmit?: (query: string) => void;
@@ -21,94 +21,100 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   onSearchSubmit
 }) => {
   const router = useRouter();
+  const [currentQuery, setCurrentQuery] = useState<string>(initialValue);
+  const [selectedButtons, setSelectedButtons] = useState<string[]>([]); // State to track selected buttons
 
   const handleSearch = (query: string) => {
     if (onSearchSubmit != null) {
-      onSearchSubmit(query)
+      onSearchSubmit(query);
     } else {
       console.log('Search submitted:', query);
       router.push(`/search?q=${encodeURIComponent(query)}`);
     }
   };
 
-  // State to manage the current value of the search input
-  const [currentQuery, setCurrentQuery] = useState<string>(initialValue);
-
-  // Handle input changes, updating the currentQuery state
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentQuery(event.target.value);
   };
 
-  // Handle Enter key press for submission
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && currentQuery.trim()) {
-      event.preventDefault(); // Prevent default form submission behavior
-      handleSearch(currentQuery.trim()); // Call the submit handler with the trimmed query
+      event.preventDefault();
+      handleSearch(currentQuery.trim());
     }
   };
 
-  // Handle click on the search icon for submission
   const handleIconClick = () => {
     if (currentQuery.trim()) {
-      handleSearch(currentQuery.trim()); // Call the submit handler with the trimmed query
+      handleSearch(currentQuery.trim());
     }
   };
 
+  const handleButtonClick = (buttonText: string) => {
+    setSelectedButtons(prevSelectedButtons => {
+      if (prevSelectedButtons.includes(buttonText)) {
+        return prevSelectedButtons.filter(text => text !== buttonText); // Deselect
+      } else {
+        return [...prevSelectedButtons, buttonText]; // Select
+      }
+    });
+  };
+
+  const buttons = ['Healthy', 'Low Calories', 'High Protein', 'Vegetarian'];
+
   return (
-    // Container to center the TextField and provide horizontal padding on larger screens
     <Container maxWidth="md" sx={{ mt: 2, mb: 2 }} disableGutters>
       <TextField
-        // Unique ID for accessibility and linking label to input
         id="search-input"
-        // Label for the TextField, acting as the placeholder
         label={placeholderText}
-        // Value of the input field, controlled by React state
         value={currentQuery}
-        // Handler for changes in the input field
         onChange={handleInputChange}
-        // Handler for keyboard events, specifically 'Enter' key for submission
         onKeyDown={handleKeyDown}
-        // Full width to make it responsive
         fullWidth
-        // Standard outlined variant for a clear visual style
         variant="outlined"
-        // InputProps to add an adornment (the search icon)
         InputProps={{
-          endAdornment: ( // Adornment at the end of the input
+          endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                // Disable button if query is empty to prevent unnecessary calls
                 disabled={!currentQuery.trim()}
-                // Handler for clicking the search icon
                 onClick={handleIconClick}
-                // Aria label for accessibility
                 aria-label="submit search"
-                // No ripple effect for a cleaner interaction (optional)
                 disableRipple
               >
-                <SearchIcon /> {/* Material-UI Search Icon */}
+                <SearchIcon />
               </IconButton>
             </InputAdornment>
           ),
         }}
-        // Aria label for the input field itself
         aria-label="search input"
       />
 
-                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <Button variant="outlined" >
-              <strong>Healthy</strong>
+      {/* Box for horizontal scrolling */}
+      <Box
+        sx={{
+          mt: 2,
+          display: 'flex',
+          overflowX: 'auto', // Enable horizontal scrolling
+          '&::-webkit-scrollbar': {
+            display: 'none', // Hide scrollbar for a cleaner look
+          },
+          scrollbarWidth: 'none', // Hide scrollbar for Firefox
+          pb: 1, // Add some padding bottom in case scrollbar appears on some systems
+        }}
+      >
+        <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}> {/* Prevent buttons from shrinking */}
+          {buttons.map((text) => (
+            <Button
+              key={text}
+              variant={selectedButtons.includes(text) ? 'contained' : 'outlined'} // Change variant based on selection
+              onClick={() => handleButtonClick(text)}
+              sx={{ flexShrink: 0 }} // Ensure buttons don't shrink
+            >
+              <strong>{text}</strong>
             </Button>
-            <Button variant="outlined">
-              <strong>Low Calories</strong>
-            </Button>
-            <Button variant="outlined">
-              <strong>High Protein</strong>
-            </Button>
-            <Button variant="outlined">
-              <strong>Vegetarian</strong>
-            </Button>
-          </Stack>
+          ))}
+        </Stack>
+      </Box>
     </Container>
   );
 };
