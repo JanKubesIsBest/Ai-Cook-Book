@@ -18,6 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6150859779793424" crossOrigin="anonymous"></script> 
+      
       <link rel="icon" href="/icon.ico" sizes="any"/>
       <body>
         <GoogleAnalytics />
