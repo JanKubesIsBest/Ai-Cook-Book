@@ -127,15 +127,15 @@ export default function AdditionalInfo({ info, recipe, discard, isFollowUp = fal
           )}
 
           {!isLoading && currentQuestion && followUpAnswer && (
-            <> 
-            <Container maxWidth="md" disableGutters>
-                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {currentQuestion}
-              </Typography>
-              <Typography variant="body1">
-                {followUpAnswer}
-              </Typography>
-            </Container>
+            <>
+              <Container maxWidth="md" disableGutters>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                  {currentQuestion}
+                </Typography>
+                <Typography variant="body1">
+                  {followUpAnswer}
+                </Typography>
+              </Container>
             </>
           )}
 

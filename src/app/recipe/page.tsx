@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRecipeContext } from "@/components/recipe-context/recipe-context";
 import AdditionalInfo from "@/components/addition-info/additional-info"; // Assuming this is MUI-compatible or handles its own styling
-import SearchComponent from "@/components/search/search-component"; // Already refactored to MUI
+import CustomSearchTextField from "@/components/search/custom-textfield"; // Import the custom text field
+// Removed: import SearchComponent from "@/components/search/search-component"; // No longer needed
 import { askAboutIngredient, generateRecipe, regenerateRecipe } from "@/utils/together-api/actions";
 import { Recipe } from "../../utils/together-api/interfaces";
 
 // MUI Imports
-import { Box, Typography, Container, List, ListItem, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Box, Typography, Container, List, ListItem, IconButton, CircularProgress } from '@mui/material';
+// Removed: import SearchIcon from '@mui/icons-material/Search'; // Not directly used here anymore for the input
 import AskAiButton from "@/components/custom-buttons/ask-ai-button/askAiButton";
 
 export default function RecipePage() {
@@ -18,6 +19,8 @@ export default function RecipePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [additionalInfo, setAdditionalInfo] = useState<{ [key: string]: string }>({});
+  // New state for the custom text field's input
+  const [recipeChangeQuery, setRecipeChangeQuery] = useState<string>('');
 
   const hasFetchedRecipe = useRef(false);
 
@@ -47,7 +50,7 @@ export default function RecipePage() {
 
     hasFetchedRecipe.current = true;
     fetchRecipe();
-  }, [selectedRecipe]); // Added selectedRecipe to dependencies to re-fetch if it changes
+  }, [selectedRecipe]);
 
   const handleSearch = async (type: "ingredient" | "step", index: number, text: string) => {
     if (generatedRecipe != null) {
@@ -68,8 +71,9 @@ export default function RecipePage() {
     });
   };
 
-  const handleRecipeChange = async (changeRequest: string) => {
-    if (!generatedRecipe) {
+  // Original handleRecipeChange now adapted to take the query directly
+  const handleRecipeChange = useCallback(async (changeRequest: string) => {
+    if (!generatedRecipe || !changeRequest.trim()) { // Ensure there's a request
       return;
     }
 
@@ -80,6 +84,7 @@ export default function RecipePage() {
       if (updatedRecipe) {
         setGeneratedRecipe(updatedRecipe);
         setAdditionalInfo({}); // Clear additional info since the recipe has changed
+        setRecipeChangeQuery(''); // Clear the input field after successful submission
       } else {
         setError("Failed to regenerate recipe");
       }
@@ -89,7 +94,20 @@ export default function RecipePage() {
     } finally {
       setLoading(false);
     }
+  }, [generatedRecipe]);
+
+  // New function to trigger handleRecipeChange from CustomSearchTextField
+  const handleRecipeChangeSubmit = () => {
+    handleRecipeChange(recipeChangeQuery);
   };
+
+  const handleRecipeChangeKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && recipeChangeQuery.trim() && !loading) {
+      event.preventDefault();
+      handleRecipeChangeSubmit();
+    }
+  };
+
 
   if (!selectedRecipe) {
     return (
@@ -100,44 +118,55 @@ export default function RecipePage() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}> {/* Main container with vertical padding */}
-      <Box sx={{ mb: 4 }}> {/* Spacing below title and search */}
-        <Typography variant="h3" component="h1" gutterBottom> {/* Title style and semantic tag */}
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom>
           {selectedRecipe.title}
         </Typography>
 
-        <Box sx={{ mb: 2 }}> {/* Spacing below search component */}
-          <SearchComponent
+        <Box sx={{ mb: 2 }}>
+          {/* Replaced SearchComponent with CustomSearchTextField */}
+          <CustomSearchTextField
+            id="recipe-change-input"
             placeholderText="Make a change to the whole recipe..."
-            onSearchSubmit={handleRecipeChange}
+            value={recipeChangeQuery}
+            onChange={(e) => setRecipeChangeQuery(e.target.value)}
+            onKeyDown={handleRecipeChangeKeyDown}
+            onSearchIconClick={handleRecipeChangeSubmit}
+            isSearchIconDisabled={!recipeChangeQuery.trim() || loading} // Disable if empty or loading
+            ariaLabel="recipe change input"
           />
         </Box>
       </Box>
 
       {loading && (
-        <Typography variant="body1" sx={{ textAlign: 'center', my: 2 }}>
-          Loading recipe...
-        </Typography>
+        <Container sx={{ textAlign: 'center', my: 4 }}> 
+          <CircularProgress size={20} color="success" /> {/* Green loading spinner */}
+          <Typography variant="body1" sx={{ textAlign: 'center', my: 2 }}>
+            Loading recipe...
+          </Typography>
+        </Container>
       )}
       {error && (
         <Typography variant="body1" color="error" sx={{ textAlign: 'center', my: 2 }}>
           {error}
         </Typography>
-      )}
+      )
+      }
 
       {generatedRecipe ? (
         <Box>
-          <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}> {/* Use pre-line for newlines */}
+          <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
             {generatedRecipe.descriptionItems}
           </Typography>
 
-          <Typography variant="h4" component="h3" gutterBottom> {/* Title style and semantic tag */}
+          <Typography variant="h4" component="h3" gutterBottom>
             Ingredients:
           </Typography>
-          <Box sx={{ pl: 2, mb: 1 }}> {/* Padding-left for list bullets, margin-bottom */}
-            <List disablePadding sx={{ listStyleType: 'disc' }}> {/* Enable disc bullets */}
+          <Box sx={{ pl: 2, mb: 1 }}>
+            <List disablePadding sx={{ listStyleType: 'disc' }}>
               {generatedRecipe.items.map((item, index) => (
-                <ListItem key={index} disableGutters sx={{ display: 'list-item', mb: 0 }}> {/* List item styling */}
+                <ListItem key={index} disableGutters sx={{ display: 'list-item', mb: 0 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <Typography variant="body1" sx={{ flexGrow: 1, mr: 1, whiteSpace: 'pre-line' }}>
                       <strong>{item}</strong>
@@ -164,17 +193,17 @@ export default function RecipePage() {
           <Typography variant="h4" component="h3" gutterBottom>
             Steps:
           </Typography>
-          <Box sx={{ pl: 2, mb: 1 }}> {/* Padding-left for list numbers, margin-bottom */}
-            <List disablePadding component="ol" sx={{ listStyleType: 'decimal' }}> {/* Enable decimal numbers */}
+          <Box sx={{ pl: 2, mb: 1 }}>
+            <List disablePadding component="ol" sx={{ listStyleType: 'decimal' }}>
               {generatedRecipe.procedureSteps.map((step, index) => (
                 <ListItem key={index} disableGutters sx={{ display: 'list-item', mb: 0 }}>
-                                    <Box
+                    <Box
                     sx={{
                       display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row' }, // Stack on xs, row on sm and up
-                      alignItems: { xs: 'flex-start', sm: 'center' }, // Align start on mobile, center on desktop
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
                       width: '100%',
-                      gap: { xs: 1, sm: 1 }, // Gap between items
+                      gap: { xs: 1, sm: 1 },
                     }}
                   >
                     <Typography variant="body1" sx={{ flexGrow: 1, mr: 1, whiteSpace: 'pre-line' }}>

@@ -2,41 +2,36 @@
 
 import React, { useState } from 'react';
 import Container from '@mui/material/Container';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
-import { useRouter } from 'next/navigation';
 import { Stack, Button, Box } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import CustomSearchTextField from './custom-textfield'; // Import the new custom component
 
-// Props interface - UPDATED to include initialSelectedStyles
+// Props interface
 interface SearchComponentProps {
   placeholderText: string;
   onSearchSubmit?: (query: string, styles: string[]) => void;
   initialValue?: string;
-  initialSelectedStyles?: string[]; // New prop for initial selected buttons
+  initialSelectedStyles?: string[];
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
   placeholderText,
   initialValue = '',
   onSearchSubmit,
-  initialSelectedStyles = [] // Default to an empty array if not provided
+  initialSelectedStyles = []
 }) => {
   const router = useRouter();
   const [currentQuery, setCurrentQuery] = useState<string>(initialValue);
-  // Initialize selectedButtons state with initialSelectedStyles
   const [selectedButtons, setSelectedButtons] = useState<string[]>(initialSelectedStyles);
 
   const handleSearch = (query: string) => {
     if (onSearchSubmit != null) {
-      onSearchSubmit(query, selectedButtons); // Pass both query and selectedButtons
+      onSearchSubmit(query, selectedButtons);
     } else {
       console.log('Search submitted:', query, 'with styles:', selectedButtons);
-      // Constructing the URL with styles
       const encodedQuery = encodeURIComponent(query);
       const encodedStyles = selectedButtons.length > 0
-        ? `&styles=${encodeURIComponent(selectedButtons.join(','))}` // Join styles with comma
+        ? `&styles=${encodeURIComponent(selectedButtons.join(','))}`
         : '';
       router.push(`/search?q=${encodedQuery}${encodedStyles}`);
     }
@@ -62,9 +57,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const handleButtonClick = (buttonText: string) => {
     setSelectedButtons(prevSelectedButtons => {
       if (prevSelectedButtons.includes(buttonText)) {
-        return prevSelectedButtons.filter(text => text !== buttonText); // Deselect
+        return prevSelectedButtons.filter(text => text !== buttonText);
       } else {
-        return [...prevSelectedButtons, buttonText]; // Select
+        return [...prevSelectedButtons, buttonText];
       }
     });
   };
@@ -73,29 +68,16 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   return (
     <Container maxWidth="md" sx={{ mt: 2, mb: 2 }} disableGutters>
-      <TextField
+      {/* Replaced TextField with CustomSearchTextField */}
+      <CustomSearchTextField
         id="search-input"
-        label={placeholderText}
+        placeholderText={placeholderText} // Passing the placeholder text from props
         value={currentQuery}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        fullWidth
-        variant="outlined"
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                disabled={!currentQuery.trim()}
-                onClick={handleIconClick}
-                aria-label="submit search"
-                disableRipple
-              >
-                <SearchIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-        aria-label="search input"
+        onSearchIconClick={handleIconClick}
+        isSearchIconDisabled={!currentQuery.trim()} // Disable if query is empty
+        ariaLabel="search input"
       />
 
       {/* Box for horizontal scrolling */}
@@ -103,21 +85,21 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         sx={{
           mt: 2,
           display: 'flex',
-          overflowX: 'auto', // Enable horizontal scrolling
+          overflowX: 'auto',
           '&::-webkit-scrollbar': {
-            display: 'none', // Hide scrollbar for a cleaner look
+            display: 'none',
           },
-          scrollbarWidth: 'none', // Hide scrollbar for Firefox
-          pb: 1, // Add some padding bottom in case scrollbar appears on some systems
+          scrollbarWidth: 'none',
+          pb: 1,
         }}
       >
-        <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}> {/* Prevent buttons from shrinking */}
+        <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
           {buttons.map((text) => (
             <Button
               key={text}
-              variant={selectedButtons.includes(text) ? 'contained' : 'outlined'} // Change variant based on selection
+              variant={selectedButtons.includes(text) ? 'contained' : 'outlined'}
               onClick={() => handleButtonClick(text)}
-              sx={{ flexShrink: 0 }} // Ensure buttons don't shrink
+              sx={{ flexShrink: 0 }}
             >
               <strong>{text}</strong>
             </Button>
