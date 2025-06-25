@@ -17,6 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link rel="icon" href="/icon.ico" sizes="any"/>
       <body>
         <StyledRoot>
           <RecipeProvider>{children}</RecipeProvider>
