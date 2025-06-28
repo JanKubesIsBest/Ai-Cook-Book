@@ -1,4 +1,6 @@
 # Project overview 
+Link: [cook-book](https://cook-book.honzas.space/)
+
 **AI wrappers, the future of all products!** 
 
 Just kidding, but this is my shot at the AI wrappers battlefield. 
